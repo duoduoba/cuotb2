@@ -1,0 +1,28 @@
+{
+  "pages":[
+    "pages/index/index",
+    "pages/editor/editor",
+    "pages/editor2/editor2",
+    "pages/my/my"
+  ],
+  "window":{
+    "backgroundTextStyle":"light",
+    "backgroundColor": "#ff0000",
+    "navigationBarBackgroundColor": "#eeeeee",
+    "navigationBarTitleText": "酬勤错题本",
+    "navigationBarTextStyle":"black"
+  },
+  "tabBar": {     
+    "backgroundColor":"#eeeeee",
+    "list": [
+      {
+        "pagePath": "pages/index/index",
+        "text": "首页"
+      },
+      {
+        "pagePath": "pages/my/my",
+        "text":"我"
+      }
+    ]
+  }
+}

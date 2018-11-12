@@ -1,0 +1,4 @@
+<image src=''></image>
+<view class='editor'>
+  <canvas canvas-id="mycanvas" class="convasAttr" bindtouchstart="touchStart" bindtouchmove="touchMove" bindtouchend="touchEnd" style=" width:{{canvasH}}px; height:{{canvasW}}px;"></canvas>
+</view>

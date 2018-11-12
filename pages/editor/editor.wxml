@@ -1,0 +1,16 @@
+<view class='editor' style='width:{{canvasW}}px; height:{{canvasH}}px'>
+  <canvas canvas-id="mycanvas" class='convasAttr' style='display:{{canvas_display}}'></canvas>
+<canvas canvas-id="mycanvas2" class='convasAttr2' bindtouchstart="touchStart" bindtouchmove="touchMove" bindtouchend="touchEnd" style='display:{{canvas2_display}}; width={{cutViewW}}px; height:{{cutViewH}}'></canvas>
+</view>
+
+
+<cover-view id="preview" class="cutView" style="width:{{cutViewW}}px; height:{{cutViewH}}px;left:{{cutViewLeft}}px; top:{{cutViewTop}}px; display:{{cut_display}}">
+  <cover-view class="upBtn" id="upBtn" bindtouchend ='cutViewDrag' bindtouchstart="cutViewDragStart"></cover-view>
+  <cover-view class="downBtn" id="downBtn" bindtouchend='cutViewDrag' bindtouchstart="cutViewDragStart"></cover-view>
+  <cover-view class="centerLeftBtn" id="centerLeftBtn" bindtouchend='cutViewDrag' bindtouchstart="cutViewDragStart"></cover-view>
+  <cover-view class="centerRightBtn" id="centerRightBtn" bindtouchend='cutViewDrag' bindtouchstart="cutViewDragStart"></cover-view>
+</cover-view>
+
+<cover-view class="section-input">
+  <cover-view bindtap="confirm"  id="ok" class='btnControl' style="background-image:url(../../res/cut2.png);background-size: 100% 100%;  transform:rotate(90deg);" plain='true' /> 
+</cover-view>

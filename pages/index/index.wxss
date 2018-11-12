@@ -1,0 +1,32 @@
+/**index.wxss**/
+.userinfo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.cuoti_status {
+  display: flex;
+  justify-content:  flex-start;
+  flex-wrap: nowrap;
+
+}
+.userinfo-avatar {
+  width: 128rpx;
+  height: 128rpx;
+  margin: 20rpx;
+  border-radius: 50%;
+}
+
+.userinfo-nickname {
+  color: black;
+  font-size: 1rem;
+}
+
+.usermotto {
+  margin-top: 200px;
+}
+
+.tmp {
+  background-color: red
+}
