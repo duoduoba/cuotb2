@@ -19,13 +19,14 @@ Page({
     wx.chooseImage({
       count: 1,
       sizeType: ['original'],
-      sourceType: ['album','camera'],
+      sourceType: ['camera'],
       //sourceType: ['camera'],
       success(res) {
         console.log(res)
         console.log("path:  " + res.tempFilePaths[0])
+        app.globalData.imagePath = res.tempFilePaths[0];
         wx.navigateTo({
-          url: '../editor/editor?path=' + res.tempFilePaths[0]
+          url: '../editor/editor'
         })
       },
       fail(res) {

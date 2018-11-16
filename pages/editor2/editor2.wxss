@@ -3,15 +3,18 @@
   padding: 0;
   box-sizing: border-box;
   display: flex;
-  justify-content: space-between;
-  flex-direction: column;
   align-items: center;
-  
-}
-
-.convasAttr {
+  justify-content: center;
   background-color: rebeccapurple;
 }
+
+
+.convasAttr {
+  background-color:black;
+  width: 100%;
+  height: 100%;
+}
+ 
 
 .command {
   position: fixed;
@@ -25,20 +28,21 @@
   z-index: 5;
   padding: 0rpx;
   display: flex;
+  flex-direction: column;
+  justify-content: space-between;
   position: fixed;
   bottom: 5rpx;
   left: 5rpx;
-  width: 100rpx;
-  height: 100rpx;
+  width: 60rpx;
+  height: 260rpx;
   box-sizing: border-box;
 }
 
-movable-area {
-  height: 400rpx;
-  width: 400rpx;
-  background-color: rebeccapurple;
-  margin: 0;
-  overflow: hidden;
+.btnControl {
+  width: 60rpx;
+  height: 60rpx;
+  border-radius: 30rpx;
+  background-color:cadetblue;
 }
 
 .cutView {
@@ -52,7 +56,7 @@ movable-area {
 .centerLeftBtn, .centerRightBtn {
   position: absolute;
   background: rgb(11, 66, 231);
-  z-index: 5;
+  z-index: 5; 
 }
 
 .upBtn {
@@ -71,29 +75,6 @@ movable-area {
   height: 40rpx;
 }
 
-.upLeftBtn {
-  top: -4px;
-  left: -4px;
-  cursor: nw-resize;
-}
-
-.upRightBtn {
-  top: -4px;
-  right: -4px;
-  cursor: ne-resize;
-}
-
-.downLeftBtn {
-  bottom: -4px;
-  left: -4px;
-  cursor: sw-resize;
-}
-
-.downRightBtn {
-  bottom: -4px;
-  right: -4px;
-  cursor: se-resize;
-}
 
 .centerLeftBtn {
   top: 50%;

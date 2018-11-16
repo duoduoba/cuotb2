@@ -1,4 +1,9 @@
-<image src=''></image>
-<view class='editor'>
-  <canvas canvas-id="mycanvas" class="convasAttr" bindtouchstart="touchStart" bindtouchmove="touchMove" bindtouchend="touchEnd" style=" width:{{canvasH}}px; height:{{canvasW}}px;"></canvas>
+<view class='editor' style='width:{{editViewW}}px; height:{{editViewH}}px'>
+<canvas canvas-id="mycanvas1" bindtouchstart="touchStart" bindtouchmove="touchMove" bindtouchend="touchEnd" style="display:block; width:{{canvasW}}px; height:{{canvasH}}px;background-color: red;"></canvas>
 </view>
+
+
+
+<cover-view class="section-input">
+  <cover-view bindtap="cutScale" class='btnControl' style="background-image:url(../../res/cut2.png);background-size: 100% 100%;  transform:rotate(90deg);" plain='true' />
+</cover-view>

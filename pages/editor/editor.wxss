@@ -1,24 +1,18 @@
 .editor {
   /*background-color: blueviolet; */
   padding: 0;
+  margin: 0;
   box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.convasAttr {
+  background-repeat:no-repeat;
   background-color:black;
-  width: 100%;
-  height: 100%;
+  transform: rotate(90deg);
+  position: absolute;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
-
-.convasAttr2 {
-  background-color: black;
-  width: 100%;
-  height: 100%;
-}
+ 
+ 
 
 .command {
   position: fixed;
