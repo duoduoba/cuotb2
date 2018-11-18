@@ -1,122 +1,139 @@
 //logs.js
 const util = require('../../utils/util.js')
 const app = getApp()
-const editdata = app.globalData.editdata
+
 Page({
   data: {
-    editViewW: 300,
-    editViewH: 227,
+    editViewW: 0,
+    editViewH: 0,
 
-    canvasW: 300,
-    canvasH: 227,
+    canvasW2: 0,
+    canvasH2: 0,
+    canvas2_display: "block",
+    canvasList: new Array(),
 
-    canvas_display: "block"
+    cutDisplay:"none"
   },
 
   onReady: function() {
-    //this.drawImage("canvas1")
+
   },
 
   onLoad: function(option) {
+    wx.showLoading({
+      title: '剪裁中，请稍后',
+    })
+    this.editdata = app.globalData.editdata
+    console.log(this.editdata)
+    //...
     this.setData({
-      editViewW: editdata.editViewH, //第一步中view旋转了90度
-      editViewH: editdata.editViewW,
-      canvasW: editdata.cutViewW,
-      canvasH: editdata.cutViewH,
+      editViewW: this.editdata.editViewH, //第一步中view旋转了90度
+      editViewH: this.editdata.editViewW,
+    })
+    console.log("canvasW:" + this.data.canvasW)
+    console.log("canvasH:" + this.data.canvasH)
+
+    var cut_ratio = this.editdata.cutViewH / this.editdata.cutViewW
+    var editview_ratio = this.editdata.editViewW / this.editdata.editViewH
+    if (cut_ratio > editview_ratio) {
+      this.setData({
+        canvasH2: this.editdata.editViewW,
+        canvasW2: this.editdata.editViewW / cut_ratio
+      })
+    } else {
+      this.setData({
+        canvasW2: this.editdata.editViewH,
+        canvasH2: this.editdata.editViewH * cut_ratio
+      })
+    }
+    console.log("canvasW2:" + this.data.canvasW2)
+    console.log("canvasH2:" + this.data.canvasH2)
+    this.data.canvasList[0] = wx.createCanvasContext("mycanvas")
+    this.data.canvasList[1] = wx.createCanvasContext("mycanvas2")
+    this.currentCanvas = 1
+    //this.drawImage(0)
+    this.drawImage(1)
+    this.setData({
+      cutTop: (this.data.editViewH - this.data.canvasH2) / 2,
+      cutLeft: (this.data.editViewW - this.data.canvasW2) / 2,
     })
   },
 
-  drawCutImage: function(e) {
-    console.log(e)
-    let ctx = this.ctx
+  getCanvasSize(canvasIndex) {
+      return {
+        "H": this.data.canvasH2,
+        "W": this.data.canvasW2
+      }
+  },
+
+  drawImage: function(canvasIndex) {
+    console.log("drawImage:" + canvasIndex)
+
+    var size = this.getCanvasSize(canvasIndex)
+    console.info("size:")
+    console.log(size)
+
+    let ctx = this.data.canvasList[canvasIndex]
+    this.ctx = ctx
     ctx.save()
 
-    console.log(" 宽度  " + this.data.cutViewW)
-    console.log(" 高度  " + this.data.cutViewH)
-    console.log(" top  " + this.data.cutViewTop)
-    console.log(" left  " + this.data.cutViewLeft)
-    app.globalData.cutView = this.data
-    //ctx.translate(this.data.canvasW / 2, this.data.canvasH / 2)
+    ctx.translate(size.W / 2, size.H / 2)
+    ctx.rotate(90 * Math.PI / 180)
 
-    ctx.drawImage(this.imagePath, 0, 0, this.data.cutViewW, this.data.cutViewH)
+    var column_offset = (this.editdata.editViewW - this.editdata.imageViewW) / 2
+    var horizon_offset = (this.editdata.editViewH - this.editdata.imageViewH) / 2
+    console.log("column_offset:" + column_offset)
+    console.log("horizon_offset:" + horizon_offset)
+
+    var sx = this.editdata.imageW * (this.editdata.cutViewTop - column_offset) / this.editdata.imageViewW
+
+    var sy = this.editdata.imageH * (this.editdata.editViewH - this.editdata.cutViewW - this.editdata.cutViewLeft - horizon_offset) / this.editdata.imageViewH
+
+    var swidth = this.editdata.imageW * this.editdata.cutViewH / this.editdata.imageViewW
+    var sheight = this.editdata.imageH * this.editdata.cutViewW / this.editdata.imageViewH
+
+    console.log(sx)
+    console.log(sy)
+    console.log(swidth)
+    console.log(sheight)
+
+    ctx.drawImage(this.editdata.imagePath, sx - 2, sy - 2, swidth + 4, sheight + 4, -size.H / 2 - 1, -size.W / 2 - 1, size.H + 2, size.W + 2)
 
     ctx.draw()
     ctx.restore()
+
+    wx.hideLoading(4)
   },
-
-  drawImage: function(e) {
-    console.log(e)
-
-    let ctx = this.ctx
-    ctx.save()
-    console.log("图片的宽度" + this.imageW)
-    console.log("图片的高度" + this.imageH)
-
-    if (this.imageW > this.imageH) {
-      console.log("图片的宽度 > 高度")
-      var image_ratio = this.imageW / this.imageH
-      var canvas_ratio = this.data.canvasH / this.data.canvasW;
-
-      console.log(" image_w=" + this.imageW + " image_h=" + this.imageH)
-      console.log(" image_ratio=" + image_ratio + " canvas_ratio=" + canvas_ratio)
-
-      ctx.translate(this.data.canvasW / 2, this.data.canvasH / 2)
-      ctx.rotate(90 * Math.PI / 180)
-
-      if (image_ratio > canvas_ratio) {
-        //按高度调整
-        console.log("按高度调整，this.data.canvasH=" + this.data.canvasH)
-        var offset = this.data.canvasW - this.data.canvasH / image_ratio
-        console.log("offset=" + offset)
-
-        ctx.drawImage(this.imagePath, -this.data.canvasH / 2, -this.data.canvasW / 2 + offset / 2, this.data.canvasH, this.data.canvasH / image_ratio)
-      } else {
-        //
-        console.log("按宽度调整，this.data.canvasH=" + this.data.canvasH)
-        var offset = this.data.canvasH - this.data.canvasW * image_ratio
-
-        console.log("offset=" + offset)
-        ctx.drawImage(this.imagePath, -this.data.canvasH / 2 + offset / 2, -this.data.canvasW / 2, this.data.canvasW * image_ratio, this.data.canvasW)
-
-      }
-      ctx.draw()
-
-    } else //竖向 
-    {
-      wx.showToast("只支持横向拍摄！")
-    }
-
-    ctx.restore()
-  },
-
-
 
   touchStart: function(e) {
     //this.ctx.clearRect(0,0,this.data.canvasW, this.data.canvasH)
-    console.log("bind touch start")
+    console.log("bind touch start: " + this.currentCanvas)
     console.log(e)
 
     this.startX = e.changedTouches[0].x
     this.startY = e.changedTouches[0].y
+    let ctx = this.ctx
 
-    //const ctx = wx.createCanvasContext("mycanvas")
-    this.ctx.setStrokeStyle('white')
-    this.ctx.setFillStyle('white')
-    this.ctx.setLineCap('round')
-    this.ctx.setLineJoin('round')
-    this.ctx.setLineWidth(20)
+    ctx.setStrokeStyle('white')
+    ctx.setFillStyle('white')
+    ctx.setLineCap('round')
+    ctx.setLineJoin('round')
 
-    this.ctx.beginPath()
-    this.ctx.arc(this.startX, this.startY, 10, 0, 2 * Math.PI);
+    ctx.setLineWidth(20)
+    ctx.beginPath()
+    ctx.arc(this.startX, this.startY, 10, 0, 2 * Math.PI);
 
-    this.ctx.fill()
-    this.ctx.draw(true)
+    ctx.fill()
+    ctx.draw(true)
 
-    this.ctx.save()
     this.time = 0;
+
   },
 
+
+
   touchMove: function(e) {
+    let ctx = this.ctx
 
     var startX1 = e.changedTouches[0].x
     var startY1 = e.changedTouches[0].y
@@ -125,154 +142,66 @@ Page({
       return;
     }
 
-    console.log(e)
-    console.log("this.startX1:" + this.startX)
-    console.log("this.startY1:" + this.startY)
-
-    console.log("startX1:" + startX1)
-    console.log("startY1:" + startY1)
-
-    this.ctx.moveTo(this.startX, this.startY)
-    this.ctx.lineTo(startX1, startY1)
-    this.ctx.stroke()
-    this.ctx.draw(true)
+    ctx.moveTo(this.startX, this.startY)
+    ctx.lineTo(startX1, startY1)
+    ctx.stroke()
+    ctx.draw(true)
 
     this.startX = startX1;
     this.startY = startY1;
+
+
   },
 
   touchEnd: function(e) {
-    this.ctx.save();
     console.log("touch end...")
   },
 
-  dragDown: function(e) {
-    console.log("touchmove......................")
-    console.log(e)
-    console.log(e.target.id)
-    console.log(e.changedTouches[0].clientX)
-    console.log(e.changedTouches[0].clientY)
-  },
 
-  cutViewDragStart: function(e) {
-    this.time = 0;
-    console.log("cutdown cutViewDragStart.....................")
-  },
-
-  cutViewDrag: function(e) {
-    console.log("cutdown view cutViewDrag......................")
-    if (e.timeStamp - this.time < 1000) {
-      console.log("cutViewDrage return")
-      //return
-    }
-    this.time = e.timeStamp
-
-    console.log(e.target.id)
-    console.log(e.changedTouches[0].clientX)
-    console.log(e.changedTouches[0].clientY)
-    let clientX = e.changedTouches[0].clientX
-    let clientY = e.changedTouches[0].clientY
-    let id = e.target.id
-    switch (id) {
-      case "upBtn":
-        let dis = clientY - this.data.cutViewTop
-        console.log("upbtn  move:" + dis)
-        this.setData({
-          cutViewTop: this.data.cutViewTop + dis,
-          cutViewH: this.data.cutViewH - dis
-        })
-        break;
-      case "downBtn":
-        dis = clientY - (this.data.cutViewTop + this.data.cutViewH)
-        console.log("downbtn move:" + dis)
-        this.setData({
-          cutViewH: this.data.cutViewH + dis
-        })
-        break;
-      case "centerLeftBtn":
-        dis = clientX - this.data.cutViewLeft
-        console.log("leftbtn move:" + dis)
-        this.setData({
-          cutViewLeft: this.data.cutViewLeft + dis,
-          cutViewW: this.data.cutViewW - dis,
-          //cutViewLeft: this.data.cutViewLeft + dis
-        })
-        break;
-
-      case "centerRightBtn":
-        dis = clientX - this.data.cutViewLeft - this.data.cutViewW
-        console.log("right btn move:" + dis)
-        this.setData({
-          cutViewW: this.data.cutViewW + dis
-        })
-        break;
-    }
-  },
-
-  confirm: function(e) {
-    //clear canvas1 , crop image into canvas2
-    console.log("confirm..")
-
-    let that = this
-    wx.canvasToTempFilePath({
-      canvasId: 'mycanvas',
-      x: this.data.cutViewLeft,
-      y: this.data.cutViewTop,
-      width: this.data.cutViewW,
-      height: this.data.cutViewH,
-      destWidth: this.data.cutViewW,
-      destHeight: this.data.cutViewH,
-      success(res) {
-        console.log(res.tempFilePath)
-        that.setData({
-          canvas_display: "none",
-          canvas2_display: "block",
-          cut_display: "none"
-        })
-
-        that.ctx.clearRect(0, 0, that.data.canvasW, that.data.canvasH)
-        that.ctx.draw()
-
-        const ctx2 = wx.createCanvasContext("mycanvas2")
-        that.ctx = ctx2
-        that.imagePath = res.tempFilePath
-        that.imageW = that.data.cutViewW
-        that.imageH = that.data.cutViewH
-        that.drawCutImage("cut view ...")
-      }
-    })
-  },
-
-  cutScale: function(e) {
-    console.log("放大..")
+  eraserSet: function(e) {
+    this.eraserType = "ractangle"
     this.setData({
-      cutViewW: this.data.cutViewW + 20,
-      cutViewH: this.data.cutViewH + 40
+      cutDisplay: "block",
     })
-    wx.canvasGetImageData({
-      canvasId: 'mycanvas2',
-      x: 0,
-      y: 0,
-      width: this.data.cutViewW,
-      height: this.data.cutViewH,
-      success: res => {
-        console.log(res.width) // 100
-        console.log(res.height) // 100
-        console.log(res.data instanceof Uint8ClampedArray) // true
-        console.log(res.data.length) // 100 * 100 * 4
-        this.ctx.scale(1.2, 1.2)
-        wx.canvasPutImageData({
-          canvasId: 'mycanvas2',
-          data: res.data,
-          x: 0,
-          y: 0,
-          width: this.data.cutViewW,
-          height: this.data.cutViewH
-        })
-      }
+  },
+
+  cutStart: function(e) {
+    console.log("cut  start...")
+    this.cutX = e.changedTouches[0].x
+    this.cutY = e.changedTouches[0].y
+    console.log(this.cutX)
+    console.log(this.cutY)
+    
+    var ctx = wx.createCanvasContext("cutcanvas")
+    this.cutCtx = ctx
+    this.cutCtx.save()
+  },
+
+  cutMove: function(e) {
+    this.cutX1 = e.changedTouches[0].x
+    this.cutY1 = e.changedTouches[0].y
+
+    console.log("move to: x=" + this.cutX1 + " y=" + this.cutY1)
+    var ctx = this.cutCtx
+
+    ctx.setStrokeStyle('red')
+    ctx.strokeRect(this.cutX, this.cutY, this.cutX1 - this.cutX, this.cutY1 - this.cutY)
+    ctx.draw()
+  },
+
+  cutEnd: function(e){
+    this.setData({
+      cutDisplay: "none",
+      canvas2_display: "block"
     })
 
-
-
+    console.log("cut from("+this.cutX + " " + this.cutY+")")
+    console.log("cut to(" + this.cutX1 + " " + this.cutY1 + ")")
+    let ctx = this.ctx
+    //ctx.fillRect(this.cutX, this.cutY, this.cutX1 - this.cutX, this.cutY1 - this.cutY)
+    //ctx.clearRect(this.cutX, this.cutY, this.cutX1 - this.cutX, this.cutY1 - this.cutY)
+    ctx.setFillStyle('white')
+    ctx.fillRect(this.cutX, this.cutY, this.cutX1 - this.cutX, this.cutY1 - this.cutY)
+    ctx.draw(true)
   }
 })

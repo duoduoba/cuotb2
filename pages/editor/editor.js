@@ -6,8 +6,16 @@ Page({
     editViewW: 100,
     editViewH: 200,
 
-    canvasW: 300,
-    canvasH: 227,
+    cutViewH: 0,
+    cutViewW:0,
+    cutViewLeft:0,
+    cutViewTop:0,
+
+    imageViewH: 0,
+    imageViewW: 0,
+    imageW:0,
+    imageH:0,
+    imagePath:"",
   },
 
   onReady: function() {
@@ -27,13 +35,10 @@ Page({
         this.setData({
           editViewW: res.windowHeight,
           editViewH: res.windowWidth,
-          //editViewW: res.windowHeight,
-          //editViewH: res.windowWidth,
+
           editViewLeft: -(res.windowHeight - res.windowWidth) / 2,
           editViewTop: (res.windowHeight - res.windowWidth) / 2,
 
-          imageViewW: res.windowHeight,
-          imageViewH: res.windowWidth,
           imagePath: app.globalData.imagePath,
 
           cutViewW: res.windowWidth * 2 / 3,
@@ -49,14 +54,16 @@ Page({
 
   imageLoad: function(e) {
     console.log(e)
-    
+    this.setData({
+      imageH: e.detail.height,
+      imageW: e.detail.width
+    })
     this.imageH = e.detail.height
     this.imageW = e.detail.width
 
     console.log("图片的宽度" + this.imageW)
     console.log("图片的高度" + this.imageH)
-    if (this.imageW <= this.imageH) {
-      
+    if (this.imageW <= this.imageH) { 
       wx.showToast("只支持横向拍摄！")
       return
     }
@@ -158,7 +165,7 @@ Page({
     console.log("confirm..")
     app.globalData.editdata = this.data;
     wx.navigateTo({
-      url: '',
+      url: '../editor2/editor2',
     })
   },
 

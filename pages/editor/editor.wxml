@@ -4,7 +4,7 @@
 
 
 <cover-view id="preview" class="cutView" style="width:{{cutViewW}}px; height:{{cutViewH}}px;left:{{cutViewLeft}}px; top:{{cutViewTop}}px; display:{{cut_display}}">
-  <cover-view class="upBtn" id="upBtn" bindtouchmove='cutViewDragEnd' bindtouchstart="cutViewDragStart"></cover-view>
+  <cover-view class="upBtn" id="upBtn" bindtouchend='cutViewDragEnd' bindtouchstart="cutViewDragStart"></cover-view>
   <cover-view class="downBtn" id="downBtn" bindtouchend='cutViewDragEnd' bindtouchstart="cutViewDragStart"></cover-view>
   <cover-view class="centerLeftBtn" id="centerLeftBtn" bindtouchend='cutViewDragEnd' bindtouchstart="cutViewDragStart"></cover-view>
   <cover-view class="centerRightBtn" id="centerRightBtn" bindtouchend='cutViewDragEnd' bindtouchstart="cutViewDragStart"></cover-view>

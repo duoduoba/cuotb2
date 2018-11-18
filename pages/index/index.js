@@ -18,7 +18,7 @@ Page({
 
     wx.chooseImage({
       count: 1,
-      sizeType: ['original'],
+      sizeType: ['compressed'],
       sourceType: ['camera'],
       //sourceType: ['camera'],
       success(res) {

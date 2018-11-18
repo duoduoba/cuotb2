@@ -5,23 +5,12 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: rebeccapurple;
+  background-color: black;
 }
 
-
-.convasAttr {
-  background-color:black;
-  width: 100%;
-  height: 100%;
-}
- 
-
-.command {
-  position: fixed;
-  padding: 0;
-  width: 40 rpx;
-  height: 40rpx;
-  background-color: royalblue;
+.cutset {
+	position:fixed;
+	z-index:1;/*确保在遮盖的元素的上方*/
 }
 
 .section-input {
@@ -41,53 +30,22 @@
 .btnControl {
   width: 60rpx;
   height: 60rpx;
-  border-radius: 30rpx;
+  border-radius: 60rpx;
   background-color:cadetblue;
-}
-
-.cutView {
-  border: 1px solid gray;
-  position: absolute;
-  background-color: rosybrown;
-  opacity: 0.4;
-}
-
-.upBtn, .downBtn, .upLeftBtn, .upRightBtn, .downLeftBtn, .downRightBtn,
-.centerLeftBtn, .centerRightBtn {
-  position: absolute;
-  background: rgb(11, 66, 231);
-  z-index: 5; 
-}
-
-.upBtn {
-  top: 0px;
-  left: 50%;
-  width: 120rpx;
-  height: 40rpx;
-  cursor: n-resize;
-}
-
-.downBtn {
-  bottom: 0px;
-  left: 50%;
-  cursor: s-resize;
-  width: 120rpx;
-  height: 40rpx;
+  text-align: center;
 }
 
 
-.centerLeftBtn {
-  top: 50%;
-  left: 0px;
-  cursor: w-resize;
-  width: 40rpx;
-  height: 120rpx;
-}
+.cut-set {
+  padding: 0;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
-.centerRightBtn {
-  top: 50%;
-  right: 0px;
-  cursor: e-resize;
-  width: 40rpx;
-  height: 120rpx;
+  z-index: 4;
+  flex-direction: column;
+  position: fixed;
+  top: 0rpx;
+  left: 0rpx;
 }

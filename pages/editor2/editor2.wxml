@@ -1,9 +1,16 @@
 <view class='editor' style='width:{{editViewW}}px; height:{{editViewH}}px'>
-<canvas canvas-id="mycanvas1" bindtouchstart="touchStart" bindtouchmove="touchMove" bindtouchend="touchEnd" style="display:block; width:{{canvasW}}px; height:{{canvasH}}px;background-color: red;"></canvas>
+
+
+  <canvas id="mycanvas2" canvas-id="mycanvas2" bindtouchstart="touchStart" bindtouchmove="touchMove" bindtouchend="touchEnd" style="display:{{canvas2_display}}; width:{{canvasW2}}px; height:{{canvasH2}}px;background-color: black;"></canvas>
+
+</view>
+
+<view class='cut-set' style='width:{{editViewW}}px; height:{{editViewH}}px;display:{{cutDisplay}}'>
+  <canvas canvas-id="cutcanvas" class="cutset" bindtouchstart="cutStart" bindtouchmove="cutMove" bindtouchend="cutEnd" style="width:{{canvasW2}}px; height:{{canvasH2}}px; top:{{cutTop}}px;left:{{cutLeft}}px"></canvas>
 </view>
 
 
 
 <cover-view class="section-input">
-  <cover-view bindtap="cutScale" class='btnControl' style="background-image:url(../../res/cut2.png);background-size: 100% 100%;  transform:rotate(90deg);" plain='true' />
+  <button class='btnControl' bindtap='eraserSet'>1</button>
 </cover-view>
