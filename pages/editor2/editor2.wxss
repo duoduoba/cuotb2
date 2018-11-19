@@ -11,6 +11,7 @@
 .cutset {
 	position:fixed;
 	z-index:1;/*确保在遮盖的元素的上方*/
+
 }
 
 .section-input {

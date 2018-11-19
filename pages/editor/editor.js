@@ -119,6 +119,7 @@ Page({
     console.log(e.target.id)
     console.log(e.changedTouches[0].clientX)
     console.log(e.changedTouches[0].clientY)
+    
     let clientX = e.changedTouches[0].clientX
     let clientY = e.changedTouches[0].clientY
     console.log("x="+clientX + " y="+clientY )

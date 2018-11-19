@@ -12,5 +12,6 @@
 
 
 <cover-view class="section-input">
-  <button class='btnControl' bindtap='eraserSet'>1</button>
+  <button id="rectangle" class='btnControl' bindtap='eraserSet'>1</button>
+  <button id="recover" class='btnControl' bindtap='eraserSet'>2</button>
 </cover-view>

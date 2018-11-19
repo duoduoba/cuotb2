@@ -1,7 +1,5 @@
-//logs.js
-const util = require('../../utils/util.js')
 const app = getApp()
-
+var stack = require("stack.js");
 Page({
   data: {
     editViewW: 0,
@@ -12,11 +10,13 @@ Page({
     canvas2_display: "block",
     canvasList: new Array(),
 
-    cutDisplay:"none"
+    cutDisplay: "none",
+
   },
 
   onReady: function() {
-
+    console.log("----------------------")
+    stack.clear()
   },
 
   onLoad: function(option) {
@@ -60,10 +60,10 @@ Page({
   },
 
   getCanvasSize(canvasIndex) {
-      return {
-        "H": this.data.canvasH2,
-        "W": this.data.canvasW2
-      }
+    return {
+      "H": this.data.canvasH2,
+      "W": this.data.canvasW2
+    }
   },
 
   drawImage: function(canvasIndex) {
@@ -106,6 +106,7 @@ Page({
   },
 
   touchStart: function(e) {
+    this.storeImageData()
     //this.ctx.clearRect(0,0,this.data.canvasW, this.data.canvasH)
     console.log("bind touch start: " + this.currentCanvas)
     console.log(e)
@@ -155,23 +156,34 @@ Page({
 
   touchEnd: function(e) {
     console.log("touch end...")
+    
   },
 
 
   eraserSet: function(e) {
-    this.eraserType = "ractangle"
-    this.setData({
-      cutDisplay: "block",
-    })
+    let id = e.target.id
+    console.log("eraserSet id:"+id)
+    switch (id) {
+      case "recover":
+        this.recoverImageData();
+        break;
+      case "rectangle":
+        this.setData({
+          cutDisplay: "block",
+        })
+        break;
+    }
   },
 
   cutStart: function(e) {
+    this.storeImageData()
     console.log("cut  start...")
+
     this.cutX = e.changedTouches[0].x
     this.cutY = e.changedTouches[0].y
     console.log(this.cutX)
     console.log(this.cutY)
-    
+
     var ctx = wx.createCanvasContext("cutcanvas")
     this.cutCtx = ctx
     this.cutCtx.save()
@@ -189,19 +201,47 @@ Page({
     ctx.draw()
   },
 
-  cutEnd: function(e){
+  cutEnd: function(e) {
     this.setData({
-      cutDisplay: "none",
-      canvas2_display: "block"
+      cutDisplay: "none"
     })
 
-    console.log("cut from("+this.cutX + " " + this.cutY+")")
+    console.log("cut from(" + this.cutX + " " + this.cutY + ")")
     console.log("cut to(" + this.cutX1 + " " + this.cutY1 + ")")
     let ctx = this.ctx
-    //ctx.fillRect(this.cutX, this.cutY, this.cutX1 - this.cutX, this.cutY1 - this.cutY)
-    //ctx.clearRect(this.cutX, this.cutY, this.cutX1 - this.cutX, this.cutY1 - this.cutY)
+    
     ctx.setFillStyle('white')
     ctx.fillRect(this.cutX, this.cutY, this.cutX1 - this.cutX, this.cutY1 - this.cutY)
     ctx.draw(true)
+  },
+
+  storeImageData: function(cb) {
+    wx.canvasToTempFilePath({
+      x: 0,
+      y: 0,
+      width: this.data.canvasW2,
+      height: this.data.canvasH2,
+      destWidth: this.data.canvasW2 * 2,
+      destHeight: this.data.canvasH2 * 2,
+      canvasId: 'mycanvas2',
+      fileType: 'jpg',
+      quality: 2.0,
+      success(re) {
+        stack.push(ret.tempFilePath)
+        console.log("push finish!")
+      }
+    })
+        
+  },
+
+  recoverImageData: function() {
+    var tmpPath = stack.pop()
+    if(tmpPath)
+    {
+      console.log("get pop:" + tmpPath)
+      this.ctx.drawImage(tmpPath, 0, 0, this.data.canvasW2, this.data.canvasH2)
+      this.ctx.draw()
+    }
+    
   }
 })
