@@ -1,5 +1,6 @@
 const app = getApp()
-var stack = require("stack.js");
+var stack = require("stack.js")
+var ActionUtil = require("drawAction.js");
 Page({
   data: {
     editViewW: 0,
@@ -11,18 +12,17 @@ Page({
     canvasList: new Array(),
 
     cutDisplay: "none",
-
+    
   },
 
   onReady: function() {
     console.log("----------------------")
     stack.clear()
+    wx.hideLoading(4)
   },
 
   onLoad: function(option) {
-    wx.showLoading({
-      title: '剪裁中，请稍后',
-    })
+    this.drawAction = new ActionUtil.DrawAction()
     this.editdata = app.globalData.editdata
     console.log(this.editdata)
     //...
@@ -30,9 +30,7 @@ Page({
       editViewW: this.editdata.editViewH, //第一步中view旋转了90度
       editViewH: this.editdata.editViewW,
     })
-    console.log("canvasW:" + this.data.canvasW)
-    console.log("canvasH:" + this.data.canvasH)
-
+    
     var cut_ratio = this.editdata.cutViewH / this.editdata.cutViewW
     var editview_ratio = this.editdata.editViewW / this.editdata.editViewH
     if (cut_ratio > editview_ratio) {
@@ -46,6 +44,7 @@ Page({
         canvasH2: this.editdata.editViewH * cut_ratio
       })
     }
+
     console.log("canvasW2:" + this.data.canvasW2)
     console.log("canvasH2:" + this.data.canvasH2)
     this.data.canvasList[0] = wx.createCanvasContext("mycanvas")
@@ -101,12 +100,10 @@ Page({
 
     ctx.draw()
     ctx.restore()
-
-    wx.hideLoading(4)
   },
 
   touchStart: function(e) {
-    this.storeImageData()
+    
     //this.ctx.clearRect(0,0,this.data.canvasW, this.data.canvasH)
     console.log("bind touch start: " + this.currentCanvas)
     console.log(e)
@@ -115,20 +112,19 @@ Page({
     this.startY = e.changedTouches[0].y
     let ctx = this.ctx
 
-    ctx.setStrokeStyle('white')
-    ctx.setFillStyle('white')
-    ctx.setLineCap('round')
-    ctx.setLineJoin('round')
-
-    ctx.setLineWidth(20)
+    this.drawAction.initCtx(ctx)
+    this.drawAction.initActionType(0, 20)
     ctx.beginPath()
     ctx.arc(this.startX, this.startY, 10, 0, 2 * Math.PI);
-
     ctx.fill()
     ctx.draw(true)
+    
+    this.drawAction.addActionData({ x: this.startX, y: this.startY })
+    this.drawAction.endAction()
 
-    this.time = 0;
-
+    //设置涂鸦类型，准备move
+    this.drawAction.initActionType(1, 20)
+    this.drawAction.addActionData({ x: this.startX, y: this.startY })
   },
 
 
@@ -138,10 +134,12 @@ Page({
 
     var startX1 = e.changedTouches[0].x
     var startY1 = e.changedTouches[0].y
-    if (Math.abs(startX1 - this.startX) < 15 && Math.abs(startY1 - this.startY) < 15) {
+    if (Math.abs(startX1 - this.startX) < 10 && Math.abs(startY1 - this.startY) < 10) {
       console.log("bind touch move  return")
       return;
     }
+
+    this.drawAction.addActionData({ x: startX1, y: startY1 })
 
     ctx.moveTo(this.startX, this.startY)
     ctx.lineTo(startX1, startY1)
@@ -151,12 +149,11 @@ Page({
     this.startX = startX1;
     this.startY = startY1;
 
-
   },
 
   touchEnd: function(e) {
     console.log("touch end...")
-    
+    this.drawAction.endAction()
   },
 
 
@@ -165,18 +162,21 @@ Page({
     console.log("eraserSet id:"+id)
     switch (id) {
       case "recover":
-        this.recoverImageData();
+        this.setData({
+          cutDisplay: "none",
+        })
         break;
       case "rectangle":
         this.setData({
           cutDisplay: "block",
         })
+
+     
         break;
     }
   },
 
   cutStart: function(e) {
-    this.storeImageData()
     console.log("cut  start...")
 
     this.cutX = e.changedTouches[0].x
@@ -185,11 +185,14 @@ Page({
     console.log(this.cutY)
 
     var ctx = wx.createCanvasContext("cutcanvas")
-    this.cutCtx = ctx
+      this.cutCtx = ctx
     this.cutCtx.save()
+    this.drawAction.initCtx(this.cutCtx)
+    this.drawAction.draw()
   },
 
   cutMove: function(e) {
+    return
     this.cutX1 = e.changedTouches[0].x
     this.cutY1 = e.changedTouches[0].y
 
@@ -202,6 +205,7 @@ Page({
   },
 
   cutEnd: function(e) {
+    return
     this.setData({
       cutDisplay: "none"
     })
@@ -213,35 +217,43 @@ Page({
     ctx.setFillStyle('white')
     ctx.fillRect(this.cutX, this.cutY, this.cutX1 - this.cutX, this.cutY1 - this.cutY)
     ctx.draw(true)
+    this.storeImageData()
   },
 
   storeImageData: function(cb) {
+    console.log("storeImageData star")
+    /* 
     wx.canvasToTempFilePath({
       x: 0,
       y: 0,
       width: this.data.canvasW2,
       height: this.data.canvasH2,
-      destWidth: this.data.canvasW2 * 2,
-      destHeight: this.data.canvasH2 * 2,
+      destWidth: this.data.canvasW2 * 4,
+      destHeight: this.data.canvasH2 * 4,
       canvasId: 'mycanvas2',
       fileType: 'jpg',
       quality: 2.0,
-      success(re) {
+      success(ret) {
         stack.push(ret.tempFilePath)
         console.log("push finish!")
+      },
+      complete(ret){
+        console.log(ret)
       }
     })
-        
+      */  
   },
 
   recoverImageData: function() {
     var tmpPath = stack.pop()
-    if(tmpPath)
+    var actions = this.ctx.getActions() 
+    console.log(actions)
+    /*if(tmpPath)
     {
       console.log("get pop:" + tmpPath)
       this.ctx.drawImage(tmpPath, 0, 0, this.data.canvasW2, this.data.canvasH2)
       this.ctx.draw()
     }
-    
+    */
   }
 })

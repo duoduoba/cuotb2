@@ -1,5 +1,5 @@
 var top = 0;
-var length = 6;
+var length = 3;
 var data = Array(length)
 
 function pop(){
@@ -9,6 +9,7 @@ function pop(){
   }
 
   top--
+  console.log("pop finish, pop:" + top)
   return  data[top]
 }
 
@@ -37,10 +38,13 @@ function push(res){
 
 function clear(){
   for (let i = 0; i < length ; i++) {
-    let fm = wx.getFileSystemManager()
-    fm.removeSavedFile({
-      filePath: data[0],
-    })
+    if (data[i])
+    {
+      let fm = wx.getFileSystemManager()
+      fm.removeSavedFile({
+        filePath: data[i],
+      })
+    }
   }
 }
 

@@ -163,6 +163,9 @@ Page({
 
   confirm: function(e) {
     //clear canvas1 , crop image into canvas2
+    wx.showLoading({
+      title: '剪裁中...',
+    })
     console.log("confirm..")
     app.globalData.editdata = this.data;
     wx.navigateTo({
