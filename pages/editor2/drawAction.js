@@ -1,11 +1,22 @@
 function DrawAction() {
   this.actions = new Array()
   this.type = 1 //0圆圈, 1 涂鸦,2 矩形
-  this.points = new Array()
+
   this.brushW = 20
   this.ctx = null
 }
  
+DrawAction.prototype.clear = function (ctx) {
+  this.actions = new Array()
+}
+
+DrawAction.prototype.pop = function () {
+  var top = this.actions.pop()
+  if (!top)return;
+  this.ctx.clearRect(0,0,300,500)
+  this.ctx.draw()
+  console.log("pop function finish")
+}
 
 DrawAction.prototype.initCtx = function(ctx) {
   this.ctx = ctx
@@ -14,16 +25,21 @@ DrawAction.prototype.initCtx = function(ctx) {
   this.ctx.setLineCap('round')
   this.ctx.setLineJoin('round')
   this.ctx.setLineWidth(this.brushW)
+  this.ctx.save()
 }
 
 DrawAction.prototype.initActionType = function(actionType, brush) {
   this.type = actionType
   this.points = new Array()
   this.brushW = brush
+  this.ctx.setLineWidth(this.brushW)
+  this.ctx.save()
 }
 
 DrawAction.prototype.addActionData = function(p) {
+  console.log("add action data :")
   this.points.push(p)
+  console.log(this.points)
 }
 
 DrawAction.prototype.endAction = function() {
@@ -35,12 +51,14 @@ DrawAction.prototype.endAction = function() {
   console.log(this.actions)
 }
 
-DrawAction.prototype.drawaArc = function(x, y) {
-  console.log("arc:" + x + " " +y)
-  
-  this.ctx.arc(x, y, this.brushW / 2, 0, 2 * Math.PI)
-  this.ctx.fill()
-  this.ctx.draw()
+DrawAction.prototype.drawaArc = function (pointArray) {
+  console.log("drawArc:")
+  console.log(pointArray)
+  for (let i = 0; i < pointArray.length; i++) {
+    this.ctx.arc(pointArray[i].x, pointArray[i].y, this.brushW / 2, 0, 2 * Math.PI)
+    this.ctx.fill()
+  }
+  this.ctx.draw(true)
 }
 
 DrawAction.prototype.drawaLine = function(pointArray) {
@@ -52,17 +70,14 @@ DrawAction.prototype.drawaLine = function(pointArray) {
     this.ctx.lineTo(pointArray[i].x, pointArray[i].y)
   }
   this.ctx.stroke()
-  this.ctx.draw()
+  this.ctx.draw(true)
 }
 
 DrawAction.prototype.drawRectangle = function(rect) {
   this.ctx.fillRect(rect.x, rect.y, rect.w, rect.h)
-  this.ctx.draw()
+  this.ctx.draw(true)
 }
 
-DrawAction.prototype.popData = function() {
-  this.actions.pop()
-}
 
 DrawAction.prototype.draw = function() {
   console.log("draw ....")
@@ -71,7 +86,7 @@ DrawAction.prototype.draw = function() {
     let act = this.actions[i]
     console.log(act.data)
     if (act.type == 0) {
-      this.drawaArc(act.data[0].x, act.data[0].y)
+      this.drawaArc(act.data)
     } else if (act.type == 1) {
       this.drawaLine(act.data)
     } else if (act.type == 2) {

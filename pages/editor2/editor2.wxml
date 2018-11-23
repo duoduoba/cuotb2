@@ -1,7 +1,7 @@
 <view class='editor' style='width:{{editViewW}}px; height:{{editViewH}}px'>
 
 
-  <canvas id="mycanvas2" canvas-id="mycanvas2" bindtouchstart="touchStart" bindtouchmove="touchMove" bindtouchend="touchEnd" style="display:{{canvas2_display}}; width:{{canvasW2}}px; height:{{canvasH2}}px;background-color: black;"></canvas>
+  <canvas id="mycanvas2" canvas-id="mycanvas2" style="display:{{canvas2_display}}; width:{{canvasW2}}px; height:{{canvasH2}}px;background-color: black;"></canvas>
 
 </view>
 

@@ -11,14 +11,18 @@ Page({
     canvas2_display: "block",
     canvasList: new Array(),
 
-    cutDisplay: "none",
+    cutDisplay: "block",
     
   },
 
   onReady: function() {
     console.log("----------------------")
-    stack.clear()
     wx.hideLoading(4)
+
+    var ctx = wx.createCanvasContext("cutcanvas")
+    this.cutCtx = ctx
+    this.drawAction.clear()
+    this.drawAction.initCtx(this.cutCtx)
   },
 
   onLoad: function(option) {
@@ -112,19 +116,27 @@ Page({
     this.startY = e.changedTouches[0].y
     let ctx = this.ctx
 
-    this.drawAction.initCtx(ctx)
-    this.drawAction.initActionType(0, 20)
+    
+    ctx.setStrokeStyle('red')
+    ctx.setFillStyle('red')
+    ctx.setLineCap('round')
+    ctx.setLineJoin('round')
+    ctx.setLineWidth(20)
+    ctx.save()
+
     ctx.beginPath()
     ctx.arc(this.startX, this.startY, 10, 0, 2 * Math.PI);
     ctx.fill()
     ctx.draw(true)
+
     
+    this.drawAction.initActionType(0, 20)
     this.drawAction.addActionData({ x: this.startX, y: this.startY })
-    this.drawAction.endAction()
+    //this.drawAction.endAction()
 
     //设置涂鸦类型，准备move
-    this.drawAction.initActionType(1, 20)
-    this.drawAction.addActionData({ x: this.startX, y: this.startY })
+    //this.drawAction.initActionType(1, 20)
+    //this.drawAction.addActionData({ x: this.startX, y: this.startY })
   },
 
 
@@ -161,99 +173,82 @@ Page({
     let id = e.target.id
     console.log("eraserSet id:"+id)
     switch (id) {
-      case "recover":
+      case "rectangle":
         this.setData({
           cutDisplay: "none",
         })
         break;
-      case "rectangle":
-        this.setData({
-          cutDisplay: "block",
-        })
-
-     
+      case "recover":
+        this.drawAction.pop()
+        this.drawAction.draw()
         break;
+     
     }
   },
+
 
   cutStart: function(e) {
     console.log("cut  start...")
 
-    this.cutX = e.changedTouches[0].x
-    this.cutY = e.changedTouches[0].y
-    console.log(this.cutX)
-    console.log(this.cutY)
+    this.startX = e.changedTouches[0].x
+    this.startY = e.changedTouches[0].y
+    let ctx = this.cutCtx
 
-    var ctx = wx.createCanvasContext("cutcanvas")
-      this.cutCtx = ctx
-    this.cutCtx.save()
-    this.drawAction.initCtx(this.cutCtx)
-    this.drawAction.draw()
-  },
+    ctx.setStrokeStyle('white')
+    ctx.setFillStyle('white')
+
+    ctx.setLineWidth(20)
+    ctx.save()
+
+    ctx.beginPath()
+    ctx.arc(this.startX, this.startY, 10, 0, 2 * Math.PI);
+    ctx.fill()
+    ctx.draw(true)
+
+
+    this.drawAction.initActionType(0, 20)
+    this.drawAction.addActionData({ x: this.startX, y: this.startY })
+    this.moved = true;
+   },
 
   cutMove: function(e) {
-    return
-    this.cutX1 = e.changedTouches[0].x
-    this.cutY1 = e.changedTouches[0].y
+    let ctx = this.cutCtx
+    if (this.moved)
+    {
+      this.moved = false;
+      this.drawAction.initActionType(1, 20)
+      this.drawAction.addActionData({ x: this.startX, y: this.startY })
+    }
 
-    console.log("move to: x=" + this.cutX1 + " y=" + this.cutY1)
-    var ctx = this.cutCtx
+    var startX1 = e.changedTouches[0].x
+    var startY1 = e.changedTouches[0].y
+    if (Math.abs(startX1 - this.startX) < 10 && Math.abs(startY1 - this.startY) < 10) {
+      console.log("bind touch move  return")
+      return;
+    }
 
-    ctx.setStrokeStyle('red')
-    ctx.strokeRect(this.cutX, this.cutY, this.cutX1 - this.cutX, this.cutY1 - this.cutY)
-    ctx.draw()
+    this.drawAction.addActionData({ x: startX1, y: startY1 })
+
+    ctx.moveTo(this.startX, this.startY)
+    ctx.lineTo(startX1, startY1)
+    ctx.stroke()
+    ctx.draw(true)
+
+    this.startX = startX1;
+    this.startY = startY1;
+
+    //ctx.setStrokeStyle('red')
+    //ctx.strokeRect(this.cutX, this.cutY, this.cutX1 - this.cutX, this.cutY1 - this.cutY)
+    //ctx.draw()
   },
 
   cutEnd: function(e) {
-    return
-    this.setData({
-      cutDisplay: "none"
-    })
+    console.log("touch end...")
+    this.moved = false
+    this.drawAction.endAction()
 
-    console.log("cut from(" + this.cutX + " " + this.cutY + ")")
-    console.log("cut to(" + this.cutX1 + " " + this.cutY1 + ")")
-    let ctx = this.ctx
-    
-    ctx.setFillStyle('white')
-    ctx.fillRect(this.cutX, this.cutY, this.cutX1 - this.cutX, this.cutY1 - this.cutY)
-    ctx.draw(true)
-    this.storeImageData()
-  },
-
-  storeImageData: function(cb) {
-    console.log("storeImageData star")
-    /* 
-    wx.canvasToTempFilePath({
-      x: 0,
-      y: 0,
-      width: this.data.canvasW2,
-      height: this.data.canvasH2,
-      destWidth: this.data.canvasW2 * 4,
-      destHeight: this.data.canvasH2 * 4,
-      canvasId: 'mycanvas2',
-      fileType: 'jpg',
-      quality: 2.0,
-      success(ret) {
-        stack.push(ret.tempFilePath)
-        console.log("push finish!")
-      },
-      complete(ret){
-        console.log(ret)
-      }
-    })
-      */  
-  },
-
-  recoverImageData: function() {
-    var tmpPath = stack.pop()
-    var actions = this.ctx.getActions() 
-    console.log(actions)
-    /*if(tmpPath)
-    {
-      console.log("get pop:" + tmpPath)
-      this.ctx.drawImage(tmpPath, 0, 0, this.data.canvasW2, this.data.canvasH2)
-      this.ctx.draw()
-    }
-    */
+    //ctx.setFillStyle('white')
+    //ctx.fillRect(this.cutX, this.cutY, this.cutX1 - this.cutX, this.cutY1 - this.cutY)
+    //.draw(true)
   }
 })
