@@ -8,11 +8,11 @@ Page({
 
     canvasW2: 0,
     canvasH2: 0,
-    canvas2_display: "block",
+
     canvasList: new Array(),
 
-    cutDisplay: "block",
-    
+    arc_radius:40,
+    rect_display: "none"
   },
 
   onReady: function() {
@@ -34,7 +34,7 @@ Page({
       editViewW: this.editdata.editViewH, //第一步中view旋转了90度
       editViewH: this.editdata.editViewW,
     })
-    
+
     var cut_ratio = this.editdata.cutViewH / this.editdata.cutViewW
     var editview_ratio = this.editdata.editViewW / this.editdata.editViewH
     if (cut_ratio > editview_ratio) {
@@ -106,83 +106,20 @@ Page({
     ctx.restore()
   },
 
-  touchStart: function(e) {
-    
-    //this.ctx.clearRect(0,0,this.data.canvasW, this.data.canvasH)
-    console.log("bind touch start: " + this.currentCanvas)
-    console.log(e)
-
-    this.startX = e.changedTouches[0].x
-    this.startY = e.changedTouches[0].y
-    let ctx = this.ctx
-
-    
-    ctx.setStrokeStyle('red')
-    ctx.setFillStyle('red')
-    ctx.setLineCap('round')
-    ctx.setLineJoin('round')
-    ctx.setLineWidth(20)
-    ctx.save()
-
-    ctx.beginPath()
-    ctx.arc(this.startX, this.startY, 10, 0, 2 * Math.PI);
-    ctx.fill()
-    ctx.draw(true)
-
-    
-    this.drawAction.initActionType(0, 20)
-    this.drawAction.addActionData({ x: this.startX, y: this.startY })
-    //this.drawAction.endAction()
-
-    //设置涂鸦类型，准备move
-    //this.drawAction.initActionType(1, 20)
-    //this.drawAction.addActionData({ x: this.startX, y: this.startY })
-  },
-
-
-
-  touchMove: function(e) {
-    let ctx = this.ctx
-
-    var startX1 = e.changedTouches[0].x
-    var startY1 = e.changedTouches[0].y
-    if (Math.abs(startX1 - this.startX) < 10 && Math.abs(startY1 - this.startY) < 10) {
-      console.log("bind touch move  return")
-      return;
-    }
-
-    this.drawAction.addActionData({ x: startX1, y: startY1 })
-
-    ctx.moveTo(this.startX, this.startY)
-    ctx.lineTo(startX1, startY1)
-    ctx.stroke()
-    ctx.draw(true)
-
-    this.startX = startX1;
-    this.startY = startY1;
-
-  },
-
-  touchEnd: function(e) {
-    console.log("touch end...")
-    this.drawAction.endAction()
-  },
-
-
   eraserSet: function(e) {
     let id = e.target.id
-    console.log("eraserSet id:"+id)
+    console.log("eraserSet id:" + id)
     switch (id) {
       case "rectangle":
         this.setData({
-          cutDisplay: "none",
+          rect_display: "block",
         })
         break;
       case "recover":
         this.drawAction.pop()
-        this.drawAction.draw()
+        //this.drawAction.draw()
         break;
-     
+
     }
   },
 
@@ -197,58 +134,92 @@ Page({
     ctx.setStrokeStyle('white')
     ctx.setFillStyle('white')
 
-    ctx.setLineWidth(20)
+    //ctx.setLineWidth(20)
     ctx.save()
 
     ctx.beginPath()
-    ctx.arc(this.startX, this.startY, 10, 0, 2 * Math.PI);
+    ctx.arc(this.startX, this.startY, this.data.arc_radius/2, 0, 2 * Math.PI);
     ctx.fill()
     ctx.draw(true)
 
-
-    this.drawAction.initActionType(0, 20)
-    this.drawAction.addActionData({ x: this.startX, y: this.startY })
-    this.moved = true;
-   },
+    this.drawAction.addActionData({
+      type:0,
+      x: this.startX,
+      y: this.startY
+    })
+  },
 
   cutMove: function(e) {
     let ctx = this.cutCtx
-    if (this.moved)
-    {
-      this.moved = false;
-      this.drawAction.initActionType(1, 20)
-      this.drawAction.addActionData({ x: this.startX, y: this.startY })
-    }
 
     var startX1 = e.changedTouches[0].x
     var startY1 = e.changedTouches[0].y
-    if (Math.abs(startX1 - this.startX) < 10 && Math.abs(startY1 - this.startY) < 10) {
+
+    let calX = startX1 - this.startX
+    let calY = startY1 - this.startY
+    let d = Math.pow((calX * calX + calY * calY), 0.5)
+
+    if (d < this.data.arc_radius / 2) {
       console.log("bind touch move  return")
       return;
     }
 
-    this.drawAction.addActionData({ x: startX1, y: startY1 })
+    this.drawAction.addActionData({
+      type:0,
+      x: startX1,
+      y: startY1
+    })
 
-    ctx.moveTo(this.startX, this.startY)
-    ctx.lineTo(startX1, startY1)
-    ctx.stroke()
-    ctx.draw(true)
-
+    ctx.arc(startX1, startY1, this.data.arc_radius / 2, 0, 2 * Math.PI);
+    ctx.fill()
+    this.cutCtx.draw(true)
     this.startX = startX1;
     this.startY = startY1;
-
-    //ctx.setStrokeStyle('red')
-    //ctx.strokeRect(this.cutX, this.cutY, this.cutX1 - this.cutX, this.cutY1 - this.cutY)
-    //ctx.draw()
   },
 
   cutEnd: function(e) {
     console.log("touch end...")
-    this.moved = false
-    this.drawAction.endAction()
+  },
 
-    //ctx.setFillStyle('white')
-    //ctx.fillRect(this.cutX, this.cutY, this.cutX1 - this.cutX, this.cutY1 - this.cutY)
-    //.draw(true)
+  rectStart: function(e){
+    console.log("rect  start...")
+    this.rectX = e.changedTouches[0].x
+    this.rectY = e.changedTouches[0].y
+    var ctx = wx.createCanvasContext("rectcanvas")
+    this.rectCtx = ctx
+    this.rectCtx.save()
+  },
+
+  rectMove: function(e){
+    this.rectX1 = e.changedTouches[0].x
+    this.rectY1 = e.changedTouches[0].y
+
+    console.log("move to: x=" + this.rectX1 + " y=" + this.rectY1)
+    var ctx = this.rectCtx
+
+    ctx.setStrokeStyle('red')
+    ctx.strokeRect(this.rectX, this.rectY, this.rectX1 - this.rectX, this.rectY1 - this.rectY)
+    ctx.draw()
+  },
+
+  rectEnd: function(e){
+    this.setData({
+      rect_display: "none"
+    })
+
+    console.log("cut from(" + this.rectX + " " + this.rectY + ")")
+    console.log("cut to(" + this.rectX1 + " " + this.rectY1 + ")")
+    let ctx = this.cutCtx
+
+    ctx.setFillStyle('white')
+    ctx.fillRect(this.rectX, this.rectY, this.rectX1 - this.rectX, this.rectY1 - this.rectY)
+    ctx.draw(true)
+    this.drawAction.addActionData({
+      type: 1,
+      x: this.rectX,
+      y: this.rectY,
+      w: this.rectX1 - this.rectX,
+      h: this.rectY1 - this.rectY
+    })
   }
 })

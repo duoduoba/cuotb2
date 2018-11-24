@@ -19,7 +19,7 @@ Page({
     wx.chooseImage({
       count: 1,
       sizeType: ['compressed'],
-      sourceType: ['camera'],
+      sourceType: [ 'album'],
       //sourceType: ['camera'],
       success(res) {
         console.log(res)

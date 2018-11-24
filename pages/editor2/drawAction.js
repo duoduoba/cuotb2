@@ -2,7 +2,7 @@ function DrawAction() {
   this.actions = new Array()
   this.type = 1 //0圆圈, 1 涂鸦,2 矩形
 
-  this.brushW = 20
+  this.brushW = 40
   this.ctx = null
 }
  
@@ -13,15 +13,40 @@ DrawAction.prototype.clear = function (ctx) {
 DrawAction.prototype.pop = function () {
   var top = this.actions.pop()
   if (!top)return;
-  this.ctx.clearRect(0,0,300,500)
-  this.ctx.draw()
+  console.log(top)
+  this.ctx.setFillStyle('red')
+  this.ctx.save()
+
+  this.ctx.globalCompositeOperation = "destination-out"
+  this.ctx.arc(top.x, top.y, this.brushW / 2 + 1, 0, 2 * Math.PI)
+  this.ctx.fill()
+  console.log('start loop')
+  for(let i = this.actions.length- 1; i > -1; i --)
+  {
+    console.log(this.actions[i])
+    let calX = this.actions[i].x - top.x
+    let calY = this.actions[i].y - top.y
+    let d = Math.pow((calX * calX + calY * calY), 0.5)
+    if (d <=this.brushW)
+    {
+      top = this.actions.pop()
+      this.ctx.arc(top.x, top.y, this.brushW / 2 + 4, 0, 2 * Math.PI)
+      this.ctx.fill()
+    }
+    else
+    {
+      break
+    }
+  }
+  this.ctx.draw(true)
+  this.ctx.restore()
   console.log("pop function finish")
 }
 
 DrawAction.prototype.initCtx = function(ctx) {
   this.ctx = ctx
-  this.ctx.setStrokeStyle('red')
-  this.ctx.setFillStyle('red')
+  this.ctx.setStrokeStyle('white')
+  this.ctx.setFillStyle('white')
   this.ctx.setLineCap('round')
   this.ctx.setLineJoin('round')
   this.ctx.setLineWidth(this.brushW)
@@ -29,26 +54,15 @@ DrawAction.prototype.initCtx = function(ctx) {
 }
 
 DrawAction.prototype.initActionType = function(actionType, brush) {
-  this.type = actionType
-  this.points = new Array()
-  this.brushW = brush
-  this.ctx.setLineWidth(this.brushW)
-  this.ctx.save()
 }
 
 DrawAction.prototype.addActionData = function(p) {
   console.log("add action data :")
-  this.points.push(p)
-  console.log(this.points)
+  this.actions.push(p)
+  console.log(this.actions)
 }
 
 DrawAction.prototype.endAction = function() {
-  this.actions.push({
-    type: this.type,
-    data: this.points
-  })
-
-  console.log(this.actions)
 }
 
 DrawAction.prototype.drawaArc = function (pointArray) {
@@ -70,7 +84,7 @@ DrawAction.prototype.drawaLine = function(pointArray) {
     this.ctx.lineTo(pointArray[i].x, pointArray[i].y)
   }
   this.ctx.stroke()
-  this.ctx.draw(true)
+  
 }
 
 DrawAction.prototype.drawRectangle = function(rect) {
@@ -82,6 +96,14 @@ DrawAction.prototype.drawRectangle = function(rect) {
 DrawAction.prototype.draw = function() {
   console.log("draw ....")
   console.log(this.actions)
+  
+  this.ctx.setStrokeStyle('red')
+  this.ctx.setFillStyle('red')
+  this.ctx.setLineCap('round')
+  this.ctx.setLineJoin('round')
+  this.ctx.setLineWidth(this.brushW)
+  this.ctx.save()
+
   for (let i = 0; i < this.actions.length; i++) {
     let act = this.actions[i]
     console.log(act.data)
@@ -93,6 +115,7 @@ DrawAction.prototype.draw = function() {
       this.drawRectangle(act.data)
     }
   }
+  this.ctx.draw()
 }
 
 module.exports.DrawAction = DrawAction

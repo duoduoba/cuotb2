@@ -1,13 +1,13 @@
 <view class='editor' style='width:{{editViewW}}px; height:{{editViewH}}px'>
 
 
-  <canvas id="mycanvas2" canvas-id="mycanvas2" style="display:{{canvas2_display}}; width:{{canvasW2}}px; height:{{canvasH2}}px;background-color: black;"></canvas>
+  <canvas id="mycanvas2" canvas-id="mycanvas2" style="width:{{canvasW2}}px; height:{{canvasH2}}px;background-color: black;"></canvas>
 
+<canvas canvas-id="cutcanvas" class="cutset" bindtouchstart="cutStart" bindtouchmove="cutMove" bindtouchend="cutEnd" style="width:{{canvasW2}}px; height:{{canvasH2}}px; top:{{cutTop}}px;left:{{cutLeft}}px"></canvas>
+
+<canvas canvas-id="rectcanvas" class="rect-set" bindtouchstart="rectStart" bindtouchmove="rectMove" bindtouchend="rectEnd" style="width:{{canvasW2}}px; height:{{canvasH2}}px; top:{{cutTop}}px;left:{{cutLeft}}px; display:{{rect_display}}; "></canvas>
 </view>
 
-<view class='cut-set' style='width:{{editViewW}}px; height:{{editViewH}}px;display:{{cutDisplay}}'>
-  <canvas canvas-id="cutcanvas" class="cutset" bindtouchstart="cutStart" bindtouchmove="cutMove" bindtouchend="cutEnd" style="width:{{canvasW2}}px; height:{{canvasH2}}px; top:{{cutTop}}px;left:{{cutLeft}}px"></canvas>
-</view>
 
 
 

@@ -30,6 +30,7 @@ Page({
     wx.getSystemInfo({
       success: res => {
         console.log(res)
+        app.globalData.platform = res.platform
         console.log("window size: " + res.windowWidth + " " + res.windowHeight)
         console.log("screen size: " + res.screenWidth + " " + res.screenHeight)
         this.setData({
@@ -41,7 +42,7 @@ Page({
 
           imagePath: app.globalData.imagePath,
 
-          cutViewW: res.windowWidth * 2 / 3,
+          cutViewW: res.windowWidth * 2 / 3 ,
           cutViewH: res.windowHeight * 2 / 3,
           cutViewLeft: res.windowWidth / 6,
           cutViewTop: res.windowHeight / 6,
@@ -168,7 +169,7 @@ Page({
     })
     console.log("confirm..")
     app.globalData.editdata = this.data;
-    wx.navigateTo({
+    wx.redirectTo({
       url: '../editor2/editor2',
     })
   },

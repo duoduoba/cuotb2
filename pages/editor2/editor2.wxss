@@ -5,13 +5,19 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: black;
+  background-color:black;
 }
 
 .cutset {
 	position:fixed;
 	z-index:1;/*确保在遮盖的元素的上方*/
-  background-color: rebeccapurple;
+  
+}
+
+.rect-set {
+  position:fixed;
+	z-index:2;/*确保在遮盖的元素的上方*/
+  background-color: royalblue;
 }
 
 .section-input {
@@ -19,7 +25,7 @@
   padding: 0rpx;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: center;
   position: fixed;
   bottom: 5rpx;
   left: 5rpx;
