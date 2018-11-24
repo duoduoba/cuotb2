@@ -1,8 +1,7 @@
 function DrawAction() {
   this.actions = new Array()
-  this.type = 1 //0圆圈, 1 涂鸦,2 矩形
+  this.type = 1 //0圆圈, 1  矩形
 
-  this.brushW = 40
   this.ctx = null
 }
  
@@ -14,30 +13,38 @@ DrawAction.prototype.pop = function () {
   var top = this.actions.pop()
   if (!top)return;
   console.log(top)
-  this.ctx.setFillStyle('red')
   this.ctx.save()
+  this.ctx.setFillStyle('white')
 
-  this.ctx.globalCompositeOperation = "destination-out"
-  this.ctx.arc(top.x, top.y, this.brushW / 2 + 1, 0, 2 * Math.PI)
-  this.ctx.fill()
-  console.log('start loop')
-  for(let i = this.actions.length- 1; i > -1; i --)
+  if(top.type == 1)
   {
-    console.log(this.actions[i])
-    let calX = this.actions[i].x - top.x
-    let calY = this.actions[i].y - top.y
-    let d = Math.pow((calX * calX + calY * calY), 0.5)
-    if (d <=this.brushW)
-    {
-      top = this.actions.pop()
-      this.ctx.arc(top.x, top.y, this.brushW / 2 + 4, 0, 2 * Math.PI)
-      this.ctx.fill()
-    }
-    else
-    {
-      break
+    this.ctx.globalCompositeOperation = "destination-out"
+    this.ctx.rect(top.x, top.y, top.w, top.h)
+    this.ctx.fill()
+  }
+  else
+  {
+    this.ctx.globalCompositeOperation = "destination-out"
+    this.ctx.arc(top.x, top.y, top.radius / 2 + 4, 0, 2 * Math.PI)
+    this.ctx.fill()
+    console.log('start loop')
+    for (let i = this.actions.length - 1; i > -1; i--) {
+      console.log(this.actions[i])
+      let calX = this.actions[i].x - top.x
+      let calY = this.actions[i].y - top.y
+      let d = Math.pow((calX * calX + calY * calY), 0.5)
+      console.log("distance:"+ d)
+      if (d < top.radius) {
+        top = this.actions.pop()
+        this.ctx.arc(top.x, top.y, top.radius / 2 + 4, 0, 2 * Math.PI)
+        this.ctx.fill()
+      }
+      else {
+        break
+      }
     }
   }
+  
   this.ctx.draw(true)
   this.ctx.restore()
   console.log("pop function finish")
@@ -49,7 +56,6 @@ DrawAction.prototype.initCtx = function(ctx) {
   this.ctx.setFillStyle('white')
   this.ctx.setLineCap('round')
   this.ctx.setLineJoin('round')
-  this.ctx.setLineWidth(this.brushW)
   this.ctx.save()
 }
 

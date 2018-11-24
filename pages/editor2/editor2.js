@@ -144,6 +144,7 @@ Page({
 
     this.drawAction.addActionData({
       type:0,
+      radius: this.data.arc_radius,
       x: this.startX,
       y: this.startY
     })
@@ -163,9 +164,10 @@ Page({
       console.log("bind touch move  return")
       return;
     }
-
+    console.log("distance:" + d)
     this.drawAction.addActionData({
       type:0,
+      radius: this.data.arc_radius,
       x: startX1,
       y: startY1
     })
