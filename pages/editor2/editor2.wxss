@@ -10,14 +10,18 @@
 
 .cutset {
 	position:fixed;
-	z-index:1;/*确保在遮盖的元素的上方*/
-  
+  z-index:2;/*确保在遮盖的元素的上方*/
+
 }
 
+.cutset2 {
+	position:fixed;
+	z-index:1;/*确保在遮盖的元素的上方*/
+}
 .rect-set {
   position:fixed;
-	z-index:2;/*确保在遮盖的元素的上方*/
-  background-color: royalblue;
+	z-index:3;/*确保在遮盖的元素的上方*/
+  
 }
 
 .section-input {
@@ -25,7 +29,7 @@
   padding: 0rpx;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: space-between;
   position: fixed;
   bottom: 5rpx;
   left: 5rpx;
@@ -34,14 +38,15 @@
   box-sizing: border-box;
 }
 
+
 .btnControl {
   width: 60rpx;
   height: 60rpx;
-  border-radius: 60rpx;
+  border-radius: 30rpx;
   background-color:cadetblue;
-  text-align: center;
+  display: flex;
+  justify-content: center;
 }
-
 
 .cut-set {
   padding: 0;

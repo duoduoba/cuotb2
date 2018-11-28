@@ -46,8 +46,7 @@
 .cutView {
   border: 1px solid gray;
   position: absolute;
-  background-color: rosybrown;
-  opacity: 0.4;
+ 
 }
 
 .upBtn, .downBtn, .upLeftBtn, .upRightBtn, .downLeftBtn, .downRightBtn,

@@ -7,19 +7,83 @@ Page({
     editViewH: 200,
 
     cutViewH: 0,
-    cutViewW:0,
-    cutViewLeft:0,
-    cutViewTop:0,
+    cutViewW: 0,
+    cutViewLeft: 0,
+    cutViewTop: 0,
 
     imageViewH: 0,
     imageViewW: 0,
-    imageW:0,
-    imageH:0,
-    imagePath:"",
+    imageW: 0,
+    imageH: 0,
+    imagePath: "",
   },
 
   onReady: function() {
     console.log("onReady  image path=" + this.imagePath)
+    let ctx = wx.createCanvasContext("cutcanvas")
+    this.ctx = ctx
+    this.drawCut()
+    //ctx.setGlobalAlpha(0.2)
+
+    this.edgeRects = Array(this.topRect, this.btmRect, this.leftRect, this.rightRect) // 上下左右
+  },
+
+  drawCut: function() {
+    let ctx = this.ctx
+    var touchH = 15
+    ctx.setStrokeStyle('white')
+    ctx.setFillStyle('white')
+    let cutRect = {
+      x: this.data.cutViewLeft,
+      y: this.data.cutViewTop,
+      w: this.data.cutViewW,
+      h: this.data.cutViewH
+    }
+    console.log("start draw cut:")
+    console.log(cutRect)
+
+    ctx.globalAlpha = 0.2
+    ctx.fillRect(cutRect.x, cutRect.y, cutRect.w, cutRect.h)
+
+    ctx.setFillStyle('blue')
+    let topRect = {
+      x: this.data.cutViewLeft + this.data.cutViewW / 4,
+      y: this.data.cutViewTop,
+      w: this.data.cutViewW / 2,
+      h: touchH
+    }
+    ctx.fillRect(topRect.x, topRect.y, topRect.w, topRect.h)
+
+    let btmRect = {
+      x: this.data.cutViewLeft + this.data.cutViewW / 4,
+      y: this.data.cutViewTop + this.data.cutViewH - touchH,
+      w: this.data.cutViewW / 2,
+      h: touchH
+    }
+    ctx.fillRect(btmRect.x, btmRect.y, btmRect.w, btmRect.h)
+
+    let leftRect = {
+      x: this.data.cutViewLeft,
+      y: this.data.cutViewTop + this.data.cutViewH / 4,
+      w: touchH,
+      h: this.data.cutViewH / 2
+    }
+    ctx.fillRect(leftRect.x, leftRect.y, leftRect.w, leftRect.h)
+    
+
+    let rightRect = {
+      x: this.data.cutViewLeft + this.data.cutViewW - touchH,
+      y: this.data.cutViewTop + this.data.cutViewH / 4,
+      w: touchH,
+      h: this.data.cutViewH / 2
+    }
+    ctx.fillRect(rightRect.x, rightRect.y, rightRect.w, rightRect.h)
+    
+    ctx.draw()
+    this.leftRect = leftRect
+    this.rightRect = rightRect
+    this.topRect = topRect
+    this.btmRect = btmRect
   },
 
   onLoad: function(option) {
@@ -42,7 +106,7 @@ Page({
 
           imagePath: app.globalData.imagePath,
 
-          cutViewW: res.windowWidth * 2 / 3 ,
+          cutViewW: res.windowWidth * 2 / 3,
           cutViewH: res.windowHeight * 2 / 3,
           cutViewLeft: res.windowWidth / 6,
           cutViewTop: res.windowHeight / 6,
@@ -64,7 +128,7 @@ Page({
 
     console.log("图片的宽度" + this.imageW)
     console.log("图片的高度" + this.imageH)
-    if (this.imageW <= this.imageH) { 
+    if (this.imageW <= this.imageH) {
       wx.showToast("只支持横向拍摄！")
       return
     }
@@ -92,7 +156,63 @@ Page({
       console.log("按宽度调整，this.data.imageViewW=" + this.data.imageViewW)
     }
     wx.hideLoading()
-    this.setData({cut_display:"block"})
+    this.setData({
+      cut_display: "block"
+    })
+  },
+
+  cutStart: function(e) {
+    this.dir = -1
+    this.startX = e.changedTouches[0].x
+    this.startY = e.changedTouches[0].y
+    console.log("start X:" + this.startX + " start Y:" + this.startY)
+    for(let i = 0; i < 4; i ++){
+      let v = this.edgeRects[i]
+      if (this.startX > v.x && this.startX < v.x + v.w && this.startY > v.y && this.startY < v.y + v.h){
+        this.dir = i;
+        console.log("touch dir rect:"+i)
+        break
+      }
+    }
+  },
+
+  cutMove: function(e)
+  {
+    if (this.dir < 0) return
+    var startX1 = e.changedTouches[0].x
+    var startY1 = e.changedTouches[0].y
+
+    let calX = startX1 - this.startX
+    let calY = startY1 - this.startY
+    console.log("calcX:" + calX + " calcY:" + calY)
+    console.log(this.dir)
+    let i = this.dir //不是方向本身，是指哪个方向的矩形
+    if (i == 0) {
+      console.log("top rect move")
+      this.data.cutViewTop += calY
+      this.data.cutViewH -= calY
+      
+    } else if (i == 1) {
+      console.log("btm rect move")
+      this.data.cutViewH += calY
+      //down
+    } else if (i == 2) {
+      this.data.cutViewLeft += calX
+      this.data.cutViewW -= calX
+      //left
+    } else {
+      //right
+      this.data.cutViewW += calX
+    }
+
+    this.drawCut()
+    this.startX = startX1
+    this.startY = startY1
+  },
+
+  cutEnd: function(e){
+    if (this.dir < 0) return
+    this.edgeRects = Array(this.topRect, this.btmRect, this.leftRect, this.rightRect)
   },
 
 
@@ -120,10 +240,10 @@ Page({
     console.log(e.target.id)
     console.log(e.changedTouches[0].clientX)
     console.log(e.changedTouches[0].clientY)
-    
+
     let clientX = e.changedTouches[0].clientX
     let clientY = e.changedTouches[0].clientY
-    console.log("x="+clientX + " y="+clientY )
+    console.log("x=" + clientX + " y=" + clientY)
 
     let id = e.target.id
     switch (id) {

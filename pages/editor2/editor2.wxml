@@ -3,15 +3,25 @@
 
   <canvas id="mycanvas2" canvas-id="mycanvas2" style="width:{{canvasW2}}px; height:{{canvasH2}}px;background-color: black;"></canvas>
 
-<canvas canvas-id="cutcanvas" class="cutset" bindtouchstart="cutStart" bindtouchmove="cutMove" bindtouchend="cutEnd" style="width:{{canvasW2}}px; height:{{canvasH2}}px; top:{{cutTop}}px;left:{{cutLeft}}px"></canvas>
+ <!-->画布1：显示点和直线，矩形 <--> 
 
-<canvas canvas-id="rectcanvas" class="rect-set" bindtouchstart="rectStart" bindtouchmove="rectMove" bindtouchend="rectEnd" style="width:{{canvasW2}}px; height:{{canvasH2}}px; top:{{cutTop}}px;left:{{cutLeft}}px; display:{{rect_display}}; "></canvas>
+  <canvas canvas-id="cutcanvas" class="cutset" bindtouchstart="cutStart" bindtouchmove="cutMove" bindtouchend="cutEnd" style="width:{{canvasW2}}px; height:{{canvasH2}}px; top:{{cutTop}}px;left:{{cutLeft}}px;  disable-scroll:true; display:{{cutcanvas_display}}"></canvas>
+
+  <!-->画布2：显示点和直线，矩形，和画布1交替显示 <-->
+  <canvas canvas-id="cutcanvas2" class="cutset2" bindtouchstart="cutStart" bindtouchmove="cutMove" bindtouchend="cutEnd" style="width:{{canvasW2}}px; height:{{canvasH2}}px; top:{{cutTop}}px;left:{{cutLeft}}px; disable-scroll:true; display:{{cutcanvas2_display}}"></canvas>
+
+  <canvas canvas-id="rectcanvas" class="rect-set" bindtouchstart="rectStart" bindtouchmove="rectMove" bindtouchend="rectEnd" style="width:{{canvasW2}}px; height:{{canvasH2}}px; top:{{cutTop}}px;left:{{cutLeft}}px; display:{{rect_display}}; "></canvas>
 </view>
 
 
 
 
 <cover-view class="section-input">
-  <button id="rectangle" class='btnControl' bindtap='eraserSet'>1</button>
-  <button id="recover" class='btnControl' bindtap='eraserSet'>2</button>
+  <button id="rectangle" class='btnControl' style='backgroud-image:url(../../res/math.jpg)' bindtap='eraserSet'>矩</button>
+
+  <cover-view id="circle" bindtap='eraserSet' class='btnControl' style="background-image:url(../../res/circle.jpeg);background-size: 100% 100%;  transform:rotate(90deg);" plain='true' />
+  <cover-view id="recover" bindtap='eraserSet' class='btnControl' style="background-image:url(../../res/undo.png);background-size: 100% 100%;  transform:rotate(90deg);" plain='true' />
+
+  <button id="ok" class='btnControl' bindtap='eraserSet'>ok</button>
+
 </cover-view>

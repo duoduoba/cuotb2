@@ -1,5 +1,5 @@
 const app = getApp()
-var stack = require("stack.js")
+//var stack = require("stack.js")
 var ActionUtil = require("drawAction.js");
 Page({
   data: {
@@ -11,8 +11,12 @@ Page({
 
     canvasList: new Array(),
 
-    arc_radius:40,
-    rect_display: "none"
+    arc_radius: 10,
+
+    rect_display: "block",
+    
+    cutcanvas_display: "block",
+    cutcanvas2_display: "none"
   },
 
   onReady: function() {
@@ -21,20 +25,24 @@ Page({
 
     var ctx = wx.createCanvasContext("cutcanvas")
     this.cutCtx = ctx
+    var ctx = wx.createCanvasContext("cutcanvas2")
+    this.cutCtx2 = ctx
     this.drawAction.clear()
-    this.drawAction.initCtx(this.cutCtx)
   },
 
   onLoad: function(option) {
     this.drawAction = new ActionUtil.DrawAction()
     this.editdata = app.globalData.editdata
     console.log(this.editdata)
-    //...
+    //edit view
     this.setData({
       editViewW: this.editdata.editViewH, //第一步中view旋转了90度
       editViewH: this.editdata.editViewW,
     })
 
+    this.data.arc_radius = this.data.editViewW / 25
+
+    //ratio
     var cut_ratio = this.editdata.cutViewH / this.editdata.cutViewW
     var editview_ratio = this.editdata.editViewW / this.editdata.editViewH
     if (cut_ratio > editview_ratio) {
@@ -112,17 +120,84 @@ Page({
     switch (id) {
       case "rectangle":
         this.setData({
-          rect_display: "block",
+          rect_display: "block"
         })
         break;
-      case "recover":
-        this.drawAction.pop()
-        //this.drawAction.draw()
-        break;
+      case "circle":
+        if (this.data.rect_display == "block") {
+          this.setData({
+            rect_display: "none"
+          })
+        }
 
+        break;
+      case "recover":
+        this.recover()
+        break;
+      case "ok":
+
+        break;
     }
   },
 
+  recover: function() {
+    
+    if(this.drawAction.pop())
+    {
+      wx.showLoading({
+        title: '清除涂鸦痕迹',
+      })
+    }
+    else
+    {
+      wx.showToast({
+        title: '已清除完毕',
+      })
+    }
+    let hide = 0
+    if (this.data.cutcanvas2_display == "none")
+    {
+      hide = 1
+      this.drawAction.setCtx(this.cutCtx2)
+      this.drawAction.draw()
+      this.setData({
+        cutcanvas2_display: "block"
+      })
+    }
+    else
+    {
+      hide = 2
+      this.drawAction.setCtx(this.cutCtx)
+      this.drawAction.draw()
+      this.setData({
+        cutcanvas_display: "block"
+      })
+    }
+    
+
+    let this_ = this
+    setTimeout(function () {
+      console.log("----Countdown----");
+      if(hide == 1)
+      {
+        this_.setData({
+          cutcanvas_display: "none"
+        })
+        this_.cutCtx.clearRect(0,0, this_.data.canvasW2, this_.data.canvasH2)
+        this_.cutCtx.draw()
+      }
+      else{
+        this_.setData({
+          cutcanvas2_display: "none"
+        })
+        this_.cutCtx2.clearRect(0, 0, this_.data.canvasW2, this_.data.canvasH2)
+        this_.cutCtx2.draw()
+      }
+      
+      wx.hideLoading()
+    },500);
+    
+  },
 
   cutStart: function(e) {
     console.log("cut  start...")
@@ -130,51 +205,61 @@ Page({
     this.startX = e.changedTouches[0].x
     this.startY = e.changedTouches[0].y
     let ctx = this.cutCtx
-
+    if (this.data.cutcanvas2_display == "block") {
+      ctx = this.cutCtx2
+    }
     ctx.setStrokeStyle('white')
-    ctx.setFillStyle('white')
-
-    //ctx.setLineWidth(20)
+    ctx.setFillStyle('#F0F0F0')
+    ctx.setLineCap('round')
+    ctx.setLineJoin('round')
+    ctx.setLineWidth(this.data.arc_radius * 2)
     ctx.save()
 
     ctx.beginPath()
-    ctx.arc(this.startX, this.startY, this.data.arc_radius/2, 0, 2 * Math.PI);
+    ctx.arc(this.startX, this.startY, this.data.arc_radius, 0, 2 * Math.PI);
     ctx.fill()
     ctx.draw(true)
 
     this.drawAction.addActionData({
-      type:0,
+      type: 0,
       radius: this.data.arc_radius,
       x: this.startX,
       y: this.startY
     })
+
   },
 
   cutMove: function(e) {
-    let ctx = this.cutCtx
-
+    
     var startX1 = e.changedTouches[0].x
     var startY1 = e.changedTouches[0].y
-
     let calX = startX1 - this.startX
     let calY = startY1 - this.startY
-    let d = Math.pow((calX * calX + calY * calY), 0.5)
 
-    if (d < this.data.arc_radius / 2) {
-      console.log("bind touch move  return")
+    if (Math.pow((calX * calX + calY * calY), 0.5) <= this.data.arc_radius + 3) {
       return;
     }
-    console.log("distance:" + d)
+
+    let ctx = this.cutCtx
+    if (this.data.cutcanvas2_display == "block") {
+      ctx = this.cutCtx2
+    }
+
     this.drawAction.addActionData({
-      type:0,
-      radius: this.data.arc_radius,
-      x: startX1,
-      y: startY1
+      type: 1,
+      x: this.startX,
+      y: this.startY,
+      x2: startX1,
+      y2: startY1,
+      lineWidth: this.data.arc_radius * 2
     })
 
-    ctx.arc(startX1, startY1, this.data.arc_radius / 2, 0, 2 * Math.PI);
-    ctx.fill()
-    this.cutCtx.draw(true)
+    console.log("touch move ,lineWidth:", this.data.arc_radius * 2)
+    ctx.moveTo(this.startX, this.startY)
+    ctx.lineTo(startX1, startY1)
+    ctx.stroke()
+    ctx.draw(true)
+
     this.startX = startX1;
     this.startY = startY1;
   },
@@ -183,45 +268,57 @@ Page({
     console.log("touch end...")
   },
 
-  rectStart: function(e){
+  rectStart: function(e) {
     console.log("rect  start...")
     this.rectX = e.changedTouches[0].x
     this.rectY = e.changedTouches[0].y
     var ctx = wx.createCanvasContext("rectcanvas")
     this.rectCtx = ctx
+    ctx.setLineDash([10, 5]);
     this.rectCtx.save()
+    this.rectEraser = false
   },
 
-  rectMove: function(e){
+  rectMove: function(e) {
+    this.rectEraser = true
     this.rectX1 = e.changedTouches[0].x
     this.rectY1 = e.changedTouches[0].y
-
-    console.log("move to: x=" + this.rectX1 + " y=" + this.rectY1)
+    //if(Math.abs(this.rectX1 - this.rectX) < 10 || Math.abs(this.rectY1 - this.rectY))
+    {
+      //return
+    }
+    //console.log("move to: x=" + this.rectX1 + " y=" + this.rectY1)
     var ctx = this.rectCtx
-
-    ctx.setStrokeStyle('red')
+    ctx.setStrokeStyle('white')
     ctx.strokeRect(this.rectX, this.rectY, this.rectX1 - this.rectX, this.rectY1 - this.rectY)
     ctx.draw()
   },
 
-  rectEnd: function(e){
-    this.setData({
-      rect_display: "none"
-    })
+  rectEnd: function(e) {
+    if (this.rectEraser == false) return;
 
-    console.log("cut from(" + this.rectX + " " + this.rectY + ")")
-    console.log("cut to(" + this.rectX1 + " " + this.rectY1 + ")")
+    this.rectCtx.clearRect(this.rectX - 4, this.rectY - 4, this.rectX1 - this.rectX + 8, this.rectY1 - this.rectY + 8)
+    this.rectCtx.draw()
+
     let ctx = this.cutCtx
-
-    ctx.setFillStyle('white')
-    ctx.fillRect(this.rectX, this.rectY, this.rectX1 - this.rectX, this.rectY1 - this.rectY)
+    if(this.data.cutcanvas2_display == "block")
+    {
+      ctx = this.cutCtx2
+    }
+    
+    
+    ctx.setFillStyle('#F0F0F0')
+    let w = this.rectX1 - this.rectX
+    let h = this.rectY1 - this.rectY
+    ctx.fillRect(this.rectX, this.rectY, w, h)
     ctx.draw(true)
+
     this.drawAction.addActionData({
-      type: 1,
+      type: 2,
       x: this.rectX,
       y: this.rectY,
-      w: this.rectX1 - this.rectX,
-      h: this.rectY1 - this.rectY
+      w: w,
+      h: h
     })
   }
 })

@@ -1,16 +1,14 @@
-<view class='editor' style='width:{{editViewW}}px; height:{{editViewH}}px; left:{{editViewLeft}}px; top:{{editViewTop}}px;'>
-<image src='{{imagePath}}' style="width: {{imageViewW}}px; height:{{imageViewH}}px;" bindload='imageLoad'></image>
+<view class='editor' style='width:{{editViewW}}px; height:{{editViewH}}px; left:{{editViewLeft}}px; top:{{editViewTop}}px;disable-scroll:true'>
+  <image src='{{imagePath}}' style="width: {{imageViewW}}px; height:{{imageViewH}}px;" bindload='imageLoad'></image>
+  
+</view>
+
+<view id="preview" class="cutView" style="width:{{editViewH}}px; height:{{editViewW}}px;left:0px; top:0px; ">
+  <canvas canvas-id="cutcanvas" bindtouchstart="cutStart" bindtouchmove="cutMove" bindtouchend="cutEnd" style='width:100%; height:100%; '></canvas>
 </view>
 
 
-<cover-view id="preview" class="cutView" style="width:{{cutViewW}}px; height:{{cutViewH}}px;left:{{cutViewLeft}}px; top:{{cutViewTop}}px; display:{{cut_display}}">
-  <cover-view class="upBtn" id="upBtn" bindtouchend='cutViewDragEnd' bindtouchstart="cutViewDragStart"></cover-view>
-  <cover-view class="downBtn" id="downBtn" bindtouchend='cutViewDragEnd' bindtouchstart="cutViewDragStart"></cover-view>
-  <cover-view class="centerLeftBtn" id="centerLeftBtn" bindtouchend='cutViewDragEnd' bindtouchstart="cutViewDragStart"></cover-view>
-  <cover-view class="centerRightBtn" id="centerRightBtn" bindtouchend='cutViewDragEnd' bindtouchstart="cutViewDragStart"></cover-view>
-</cover-view>
-
 <cover-view class="section-input">
   <cover-view bindtap="confirm" class='btnControl' style="background-image:url(../../res/cut2.png);background-size: 100% 100%;  transform:rotate(90deg);" plain='true' />
- 
+
 </cover-view>

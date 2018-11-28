@@ -1,19 +1,20 @@
 {
-  "pages":[
+  "pages": [
     "pages/index/index",
     "pages/editor/editor",
     "pages/editor2/editor2",
-    "pages/my/my"
+    "pages/my/my",
+    "pages/done/done"
   ],
-  "window":{
-    "backgroundTextStyle":"light",
+  "window": {
+    "backgroundTextStyle": "light",
     "backgroundColor": "#ff0000",
     "navigationBarBackgroundColor": "#eeeeee",
     "navigationBarTitleText": "酬勤错题本",
-    "navigationBarTextStyle":"black"
+    "navigationBarTextStyle": "black"
   },
-  "tabBar": {     
-    "backgroundColor":"#eeeeee",
+  "tabBar": {
+    "backgroundColor": "#eeeeee",
     "list": [
       {
         "pagePath": "pages/index/index",
@@ -21,7 +22,7 @@
       },
       {
         "pagePath": "pages/my/my",
-        "text":"我"
+        "text": "我"
       }
     ]
   }
