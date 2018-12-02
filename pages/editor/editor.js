@@ -5,6 +5,7 @@ Page({
   data: {
     editViewW: 100,
     editViewH: 200,
+    rotate_degree: 90,
 
     cutViewH: 0,
     cutViewW: 0,
@@ -20,71 +21,8 @@ Page({
 
   onReady: function() {
     console.log("onReady  image path=" + this.imagePath)
-    let ctx = wx.createCanvasContext("cutcanvas")
-    this.ctx = ctx
-    this.drawCut()
-    //ctx.setGlobalAlpha(0.2)
-
-    this.edgeRects = Array(this.topRect, this.btmRect, this.leftRect, this.rightRect) // 上下左右
   },
 
-  drawCut: function() {
-    let ctx = this.ctx
-    var touchH = 15
-    ctx.setStrokeStyle('white')
-    ctx.setFillStyle('white')
-    let cutRect = {
-      x: this.data.cutViewLeft,
-      y: this.data.cutViewTop,
-      w: this.data.cutViewW,
-      h: this.data.cutViewH
-    }
-    console.log("start draw cut:")
-    console.log(cutRect)
-
-    ctx.globalAlpha = 0.2
-    ctx.fillRect(cutRect.x, cutRect.y, cutRect.w, cutRect.h)
-
-    ctx.setFillStyle('blue')
-    let topRect = {
-      x: this.data.cutViewLeft + this.data.cutViewW / 4,
-      y: this.data.cutViewTop,
-      w: this.data.cutViewW / 2,
-      h: touchH
-    }
-    ctx.fillRect(topRect.x, topRect.y, topRect.w, topRect.h)
-
-    let btmRect = {
-      x: this.data.cutViewLeft + this.data.cutViewW / 4,
-      y: this.data.cutViewTop + this.data.cutViewH - touchH,
-      w: this.data.cutViewW / 2,
-      h: touchH
-    }
-    ctx.fillRect(btmRect.x, btmRect.y, btmRect.w, btmRect.h)
-
-    let leftRect = {
-      x: this.data.cutViewLeft,
-      y: this.data.cutViewTop + this.data.cutViewH / 4,
-      w: touchH,
-      h: this.data.cutViewH / 2
-    }
-    ctx.fillRect(leftRect.x, leftRect.y, leftRect.w, leftRect.h)
-    
-
-    let rightRect = {
-      x: this.data.cutViewLeft + this.data.cutViewW - touchH,
-      y: this.data.cutViewTop + this.data.cutViewH / 4,
-      w: touchH,
-      h: this.data.cutViewH / 2
-    }
-    ctx.fillRect(rightRect.x, rightRect.y, rightRect.w, rightRect.h)
-    
-    ctx.draw()
-    this.leftRect = leftRect
-    this.rightRect = rightRect
-    this.topRect = topRect
-    this.btmRect = btmRect
-  },
 
   onLoad: function(option) {
     wx.showLoading({
@@ -98,9 +36,9 @@ Page({
         console.log("window size: " + res.windowWidth + " " + res.windowHeight)
         console.log("screen size: " + res.screenWidth + " " + res.screenHeight)
         this.setData({
+          //默认设置横向图片的view
           editViewW: res.windowHeight,
           editViewH: res.windowWidth,
-
           editViewLeft: -(res.windowHeight - res.windowWidth) / 2,
           editViewTop: (res.windowHeight - res.windowWidth) / 2,
 
@@ -117,6 +55,11 @@ Page({
     this.imagePath = app.globalData.imagePath
   },
 
+  cutMove:function(e)
+  {
+    console.log("touch...",e)
+  },
+
   imageLoad: function(e) {
     console.log(e)
     this.setData({
@@ -128,37 +71,83 @@ Page({
 
     console.log("图片的宽度" + this.imageW)
     console.log("图片的高度" + this.imageH)
+    console.log("EditView的宽度" + this.data.editViewW)
+    console.log("EditView的高度" + this.data.editViewH)
+
     if (this.imageW <= this.imageH) {
-      wx.showToast("只支持横向拍摄！")
-      return
+      //如果是竖向，调整宽和高
+      let h = this.data.editViewW
+      let w = this.data.editViewH
+      this.setData({
+        //竖向图片的view，交换横宽数值
+        editViewW: w,
+        editViewH: h,
+        editViewLeft: 0,
+        editViewTop: 0,
+        rotate_degree: 0
+    })
     }
 
 
-    console.log("图片的宽度 > 高度")
     var image_ratio = this.imageW / this.imageH
+    //横向比例
     var editview_ratio = this.data.editViewW / this.data.editViewH;
+    //如果是竖向拍摄，计算竖向比例
+    if (this.imageW <= this.imageH) {
+      image_ratio = this.imageH / this.imageW
+      editview_ratio = this.data.editViewH / this.data.editViewW
+    }
     console.log(" image_ratio=" + image_ratio + " editview_ratio=" + editview_ratio)
 
     if (image_ratio > editview_ratio) {
       //按高度调整
+      if (this.imageW > this.imageH) {
+        //横向
       this.setData({
         imageViewW: this.data.editViewW,
         imageViewH: this.data.editViewW / image_ratio
       })
+      }
+      else 
+      {
+        //竖向
+        this.setData({
+          imageViewW: this.data.editViewH /image_ratio,
+          imageViewH: this.data.editViewH
+        })
+      }
       console.log("按高度调整，this.data.imageViewH=" + this.data.imageViewH)
       console.log("按高度调整，this.data.imageViewW=" + this.data.imageViewW)
     } else {
-      this.setData({
-        imageViewH: this.data.editViewH,
-        imageViewW: this.data.editViewH * image_ratio
-      })
+      //按宽度调整
+      if (this.imageW > this.imageH)
+      {
+        //横向
+        this.setData({
+          imageViewH: this.data.editViewH,
+          imageViewW: this.data.editViewH * image_ratio
+        })
+      }
+      else
+      {
+        //竖向
+        this.setData({
+          imageViewH: this.data.editViewW * image_ratio,
+          imageViewW: this.data.editViewW,
+        })
+      }
+      
       console.log("按宽度调整，this.data.imageViewH=" + this.data.imageViewH)
       console.log("按宽度调整，this.data.imageViewW=" + this.data.imageViewW)
     }
+
+    
+    //图片加载后，显示切割图层
+    let ctx = wx.createCanvasContext("cutcanvas")
+    this.ctx = ctx
+    this.drawCut()
+    this.edgeRects = Array(this.topRect, this.btmRect, this.leftRect, this.rightRect) // 上下左右
     wx.hideLoading()
-    this.setData({
-      cut_display: "block"
-    })
   },
 
   cutStart: function(e) {
@@ -188,12 +177,12 @@ Page({
     console.log(this.dir)
     let i = this.dir //不是方向本身，是指哪个方向的矩形
     if (i == 0) {
-      console.log("top rect move")
+      //console.log("top rect move")
       this.data.cutViewTop += calY
       this.data.cutViewH -= calY
       
     } else if (i == 1) {
-      console.log("btm rect move")
+      //console.log("btm rect move")
       this.data.cutViewH += calY
       //down
     } else if (i == 2) {
@@ -208,6 +197,64 @@ Page({
     this.drawCut()
     this.startX = startX1
     this.startY = startY1
+  },
+
+  drawCut: function () {
+    let ctx = this.ctx
+    let w = this.data.rotate_degree == 90 ? this.data.editViewH : this.data.editViewW
+    var touchH = w / 15
+
+    ctx.setFillStyle('green')
+    let cutRect = {
+      x: this.data.cutViewLeft,
+      y: this.data.cutViewTop,
+      w: this.data.cutViewW,
+      h: this.data.cutViewH
+    }
+
+
+    ctx.globalAlpha = 0.2
+    ctx.fillRect(cutRect.x, cutRect.y, cutRect.w, cutRect.h)
+
+    ctx.setFillStyle('blue')
+    let topRect = {
+      x: this.data.cutViewLeft + this.data.cutViewW / 4,
+      y: this.data.cutViewTop,
+      w: this.data.cutViewW / 2,
+      h: touchH
+    }
+    ctx.fillRect(topRect.x, topRect.y, topRect.w, topRect.h)
+
+    let btmRect = {
+      x: this.data.cutViewLeft + this.data.cutViewW / 4,
+      y: this.data.cutViewTop + this.data.cutViewH - touchH,
+      w: this.data.cutViewW / 2,
+      h: touchH
+    }
+    ctx.fillRect(btmRect.x, btmRect.y, btmRect.w, btmRect.h)
+
+    let leftRect = {
+      x: this.data.cutViewLeft,
+      y: this.data.cutViewTop + this.data.cutViewH / 4,
+      w: touchH,
+      h: this.data.cutViewH / 2
+    }
+    ctx.fillRect(leftRect.x, leftRect.y, leftRect.w, leftRect.h)
+
+
+    let rightRect = {
+      x: this.data.cutViewLeft + this.data.cutViewW - touchH,
+      y: this.data.cutViewTop + this.data.cutViewH / 4,
+      w: touchH,
+      h: this.data.cutViewH / 2
+    }
+    ctx.fillRect(rightRect.x, rightRect.y, rightRect.w, rightRect.h)
+
+    ctx.draw()
+    this.leftRect = leftRect
+    this.rightRect = rightRect
+    this.topRect = topRect
+    this.btmRect = btmRect
   },
 
   cutEnd: function(e){
@@ -289,7 +336,8 @@ Page({
     })
     console.log("confirm..")
     app.globalData.editdata = this.data;
-    wx.redirectTo({
+    //wx.redirectTo({
+    wx.navigateTo({
       url: '../editor2/editor2',
     })
   },

@@ -5,8 +5,7 @@
   box-sizing: border-box;
   background-repeat:no-repeat;
   background-color:black;
-  transform: rotate(90deg);
-  position: absolute;
+  position: fixed;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -19,28 +18,27 @@
   padding: 0;
   width: 40 rpx;
   height: 40rpx;
-  background-color: royalblue;
+  background-color: rosybrow gray;
 }
 
 .section-input {
   z-index: 5;
   padding: 0rpx;
   display: flex;
-  flex-direction: column;
-  justify-content: space-between;
   position: fixed;
-  bottom: 5rpx;
-  left: 5rpx;
-  width: 60rpx;
-  height: 260rpx;
+  bottom: 10rpx;
+  left: 10rpx;
+  width: 70rpx;
+  height: 70rpx;
   box-sizing: border-box;
+  transform: rotate(90deg);
 }
 
 .btnControl {
-  width: 60rpx;
-  height: 60rpx;
-  border-radius: 30rpx;
-  background-color:cadetblue;
+  width: 70rpx;
+  height: 70rpx;
+  border-radius: 35rpx;
+  background-color:white;
 }
 
 .cutView {
