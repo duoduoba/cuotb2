@@ -7,18 +7,20 @@ Page({
    */
   data: {
     editted_image: "",
-    cutted_image: ""
+    cutted_image: "",
+    rotate_value:90
   },
 
   /**
    * 生命周期函数--监听页面加载
    */
   onLoad: function (options) {
+    wx.hideLoading()
     console.log("done.....onload")
-    console.log(app.globalData.cutted_image)
+    console.log(options)
     this.setData({
-      cutted_image: app.globalData.cutted_image,
-      editted_image: app.globalData.editted_image
+      cutted_image: options.cut,
+      editted_image: options.edit
     })
   },
 

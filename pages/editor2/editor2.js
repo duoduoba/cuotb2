@@ -155,16 +155,8 @@ Page({
   },
 
   hideLoading: function() {
+    console.log("hide loading callback....")
     wx.hideLoading()
-    wx.canvasToTempFilePath({
-      canvasId:"image_canvas",
-      quality:1.0,
-      success: function (res){
-        app.globalData.cutted_image = res.tempFilePath
-        console.log("原题: "+res.tempFilePath)
-      }
-    })
-    
   },
 
   eraserSet: function(e) {
@@ -211,41 +203,67 @@ Page({
         this.recover()
         break;
       case "ok":
-        if (this.data.tuya_canvas_display == "block" || this.data.tuya_canvas_display == "block" || this.data.tuya_canvas2_display == "block") {
-          this.setData({
-            rect_display: "none",
-            tuya_canvas_display: "none",
-            tuya_canvas2_display: "none",
-            rect_display: "none"
-          })
-          wx.showLoading({
-            title: '编辑完成',
-          })
-          this.drawAction.setCtx(this.ctx)
-          this.drawAction.draw(this.okCB, true)
-        }
+
+        wx.showLoading({
+          title: '编辑完成',
+        })
+
+        //this.drawAction.setCtx(_this.ctx)
+        //_this.drawAction.draw(_this.okCB, true) 
+        this.saveOriginalImage()
         break;
     }
   },
 
-  okCB: function() {
-    wx.hideLoading()
-    var promis = new Promise(function(resolve, reject){
+  saveOriginalImage: function() {
+    let _this = this
+    var promis = new Promise(function(resolve, reject) {
+      
       wx.canvasToTempFilePath({
         canvasId: "image_canvas",
         quality: 1.0,
-        success: function (res) {
-          app.globalData.editted_image = res.tempFilePath
-          console.log("编辑后题目: " + res.tempFilePath)
+        success: function(res) {
+          _this.data.cutted_image = res.tempFilePath
+          console.log("编辑原题目: " + _this.data.cutted_image)
           resolve(res.tempFilePath)
+          ctx.restore()
         },
-        fail:function(res){}
+        fail: function(res) {
+          console.log("保存原题失败:", res)
+        }
       })
     })
-    
-    promis.then(function(res){
+
+    promis.then(function(res) {
+      console.log("tuya start ...")
+      _this.drawAction.setCtx(_this.ctx)
+      _this.drawAction.draw(_this.okCB, true)
+    })
+  },
+
+  okCB: function() {
+    console.log("tuya finish callback")
+    let _this = this
+    var promis = new Promise(function(resolve, reject) {
+      wx.canvasToTempFilePath({
+        canvasId: "image_canvas",
+        quality: 1.0,
+        success: function(res) {
+          _this.data.editted_image = res.tempFilePath
+          console.log("编辑后题目: " + _this.data.editted_image)
+          resolve(res.tempFilePath)
+        },
+        fail: function(res) {
+          console.log("failed:", res)
+        }
+      })
+    })
+
+    promis.then(function(res) {
+      let img1 = _this.data.cutted_image
+      let img2 = _this.data.editted_image
       wx.navigateTo({
-        url: '../done/done',
+        url: '../done/done?cut=' + img1 + "&edit=" + img2,
       })
     })
   },
@@ -305,7 +323,7 @@ Page({
   //以下为涂鸦：点 线 矩形
   //
   ////////////////////////////////////////////////////////////////
-  
+
 
   tuyaStart: function(e) {
     console.log("cut  start...")

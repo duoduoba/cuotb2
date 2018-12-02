@@ -38,6 +38,14 @@ Page({
     })
 
   },
+
+  bindViewTap2:function(e){
+
+    wx.navigateTo({
+      url: '../done/done'
+    })
+  },
+
   onLoad: function() {
     if (app.globalData.userInfo) {
       this.setData({
