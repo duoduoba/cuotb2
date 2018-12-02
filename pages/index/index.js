@@ -25,6 +25,8 @@ Page({
         console.log(res)
         console.log("path:  " + res.tempFilePaths[0])
         app.globalData.imagePath = res.tempFilePaths[0];
+        app.globalData.imageOrientation = res.orientation
+        console.log("imageOrientation:", app.globalData.imageOrientation)
         wx.navigateTo({
           url: '../editor/editor'
         })

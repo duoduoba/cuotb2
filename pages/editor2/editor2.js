@@ -1,32 +1,34 @@
 const app = getApp()
 //var stack = require("stack.js")
+var util = require("util.js")
 var ActionUtil = require("drawAction.js");
 Page({
   data: {
     editViewW: 0,
     editViewH: 0,
 
-    canvasW2: 0,
-    canvasH2: 0,
+    canvasW: 0,
+    canvasH: 0,
 
     canvasList: new Array(),
 
     arc_radius: 10,
 
     rect_display: "block",
-    
-    cutcanvas_display: "block",
-    cutcanvas2_display: "none"
+    tuya_canvas_display: "block",
+    tuya_canvas2_display: "none",
+
+    circle_image: "circlem",
+    rect_image: "rect_s"
   },
 
   onReady: function() {
     console.log("----------------------")
-    wx.hideLoading(4)
+    this.tohide = "nothing"
+    this.tuyaCtx = wx.createCanvasContext("tuya_canvas")
 
-    var ctx = wx.createCanvasContext("cutcanvas")
-    this.cutCtx = ctx
-    var ctx = wx.createCanvasContext("cutcanvas2")
-    this.cutCtx2 = ctx
+    this.tuyaCtx2 = wx.createCanvasContext("tuya_canvas2")
+
     this.drawAction.clear()
   },
 
@@ -34,46 +36,54 @@ Page({
     this.drawAction = new ActionUtil.DrawAction()
     this.editdata = app.globalData.editdata
     console.log(this.editdata)
-    //edit view
+
+    let h = this.editdata.rotate_degree > 0 ? this.editdata.editViewW : this.editdata.editViewH
+    let w = this.editdata.rotate_degree > 0 ? this.editdata.editViewH : this.editdata.editViewW
+
+    //ratio 预计算
+    var cut_ratio = this.editdata.cutViewH / this.editdata.cutViewW
+    var editview_ratio = h / w
+
+    //注意！！！！EditView是和window size看齐的
     this.setData({
-      editViewW: this.editdata.editViewH, //第一步中view旋转了90度
-      editViewH: this.editdata.editViewW,
+      editViewW: w,
+      editViewH: h,
     })
 
-    this.data.arc_radius = this.data.editViewW / 25
 
-    //ratio
-    var cut_ratio = this.editdata.cutViewH / this.editdata.cutViewW
-    var editview_ratio = this.editdata.editViewW / this.editdata.editViewH
     if (cut_ratio > editview_ratio) {
+      //按高度适配到window height
       this.setData({
-        canvasH2: this.editdata.editViewW,
-        canvasW2: this.editdata.editViewW / cut_ratio
+        canvasH: h,
+        canvasW: h / cut_ratio
       })
     } else {
+      //按宽度适配到window width
       this.setData({
-        canvasW2: this.editdata.editViewH,
-        canvasH2: this.editdata.editViewH * cut_ratio
+        canvasW: w,
+        canvasH: w * cut_ratio
       })
     }
 
-    console.log("canvasW2:" + this.data.canvasW2)
-    console.log("canvasH2:" + this.data.canvasH2)
+    console.log("canvasW:" + this.data.canvasW)
+    console.log("canvasH:" + this.data.canvasH)
     this.data.canvasList[0] = wx.createCanvasContext("mycanvas")
-    this.data.canvasList[1] = wx.createCanvasContext("mycanvas2")
+    this.data.canvasList[1] = wx.createCanvasContext("image_canvas")
+
     this.currentCanvas = 1
+    this.data.arc_radius = this.data.editViewW / 25
     //this.drawImage(0)
     this.drawImage(1)
     this.setData({
-      cutTop: (this.data.editViewH - this.data.canvasH2) / 2,
-      cutLeft: (this.data.editViewW - this.data.canvasW2) / 2,
+      cutTop: (this.data.editViewH - this.data.canvasH) / 2,
+      cutLeft: (this.data.editViewW - this.data.canvasW) / 2,
     })
   },
 
   getCanvasSize(canvasIndex) {
     return {
-      "H": this.data.canvasH2,
-      "W": this.data.canvasW2
+      "H": this.data.canvasH,
+      "W": this.data.canvasW
     }
   },
 
@@ -88,30 +98,73 @@ Page({
     this.ctx = ctx
     ctx.save()
 
-    ctx.translate(size.W / 2, size.H / 2)
-    ctx.rotate(90 * Math.PI / 180)
+    let h = this.editdata.rotate_degree > 0 ? this.editdata.editViewW : this.editdata.editViewH
+    let w = this.editdata.rotate_degree > 0 ? this.editdata.editViewH : this.editdata.editViewW
 
-    var column_offset = (this.editdata.editViewW - this.editdata.imageViewW) / 2
-    var horizon_offset = (this.editdata.editViewH - this.editdata.imageViewH) / 2
-    console.log("column_offset:" + column_offset)
-    console.log("horizon_offset:" + horizon_offset)
 
-    var sx = this.editdata.imageW * (this.editdata.cutViewTop - column_offset) / this.editdata.imageViewW
+    if (this.editdata.rotate_degree > 0) {
+      //横向旋转图片 - 横拍
+      console.log("旋转图片")
+      ctx.translate(size.W / 2, size.H / 2)
+      ctx.rotate(90 * Math.PI / 180)
 
-    var sy = this.editdata.imageH * (this.editdata.editViewH - this.editdata.cutViewW - this.editdata.cutViewLeft - horizon_offset) / this.editdata.imageViewH
+      var column_offset = (this.editdata.editViewW - this.editdata.imageViewW) / 2
+      var horizon_offset = (this.editdata.editViewH - this.editdata.imageViewH) / 2
+      console.log("column_offset:" + column_offset)
+      console.log("horizon_offset:" + horizon_offset)
 
-    var swidth = this.editdata.imageW * this.editdata.cutViewH / this.editdata.imageViewW
-    var sheight = this.editdata.imageH * this.editdata.cutViewW / this.editdata.imageViewH
+      var sx = this.editdata.imageW * (this.editdata.cutViewTop - column_offset) / this.editdata.imageViewW
 
-    console.log(sx)
-    console.log(sy)
-    console.log(swidth)
-    console.log(sheight)
+      var sy = this.editdata.imageH * (this.editdata.editViewH - this.editdata.cutViewW - this.editdata.cutViewLeft - horizon_offset) / this.editdata.imageViewH
 
-    ctx.drawImage(this.editdata.imagePath, sx - 2, sy - 2, swidth + 4, sheight + 4, -size.H / 2 - 1, -size.W / 2 - 1, size.H + 2, size.W + 2)
+      var swidth = this.editdata.imageW * this.editdata.cutViewH / this.editdata.imageViewW
+      var sheight = this.editdata.imageH * this.editdata.cutViewW / this.editdata.imageViewH
 
-    ctx.draw()
+      console.log(sx)
+      console.log(sy)
+      console.log(swidth)
+      console.log(sheight)
+
+      ctx.drawImage(this.editdata.imagePath, sx - 2, sy - 2, swidth + 4, sheight + 4, -size.H / 2 - 1, -size.W / 2 - 1, size.H + 2, size.W + 2)
+
+    } else {
+
+      //无旋转图片，或者竖拍
+      console.log("无旋转图片")
+      var horizon_offset = (this.editdata.editViewW - this.editdata.imageViewW) / 2
+      var column_offset = (this.editdata.editViewH - this.editdata.imageViewH) / 2
+      console.log("column_offset:" + column_offset)
+      console.log("horizon_offset:" + horizon_offset)
+
+      var sx = this.editdata.imageW * (this.editdata.cutViewLeft - horizon_offset) / this.editdata.imageViewW
+
+      var sy = this.editdata.imageH * (this.editdata.cutViewTop - column_offset) / this.editdata.imageViewH
+
+      var swidth = this.editdata.imageW * this.editdata.cutViewW / this.editdata.imageViewW
+      var sheight = this.editdata.imageH * this.editdata.cutViewH / this.editdata.imageViewH
+
+      console.log(sx)
+      console.log(sy)
+      console.log(swidth)
+      console.log(sheight)
+
+      ctx.drawImage(this.editdata.imagePath, sx - 2, sy - 2, swidth + 4, sheight + 4, 0, 0, size.W, size.H)
+    }
+    ctx.draw(false, this.hideLoading)
     ctx.restore()
+  },
+
+  hideLoading: function() {
+    wx.hideLoading()
+    wx.canvasToTempFilePath({
+      canvasId:"image_canvas",
+      quality:1.0,
+      success: function (res){
+        app.globalData.cutted_image = res.tempFilePath
+        console.log("原题: "+res.tempFilePath)
+      }
+    })
+    
   },
 
   eraserSet: function(e) {
@@ -119,15 +172,38 @@ Page({
     console.log("eraserSet id:" + id)
     switch (id) {
       case "rectangle":
-        this.setData({
-          rect_display: "block"
-        })
+        if (this.data.rect_display == "none") {
+          let img = util.unselect_circle_image(this.data.circle_image)
+          this.setData({
+            rect_display: "block",
+            rect_image: "rect_s",
+            circle_image: img
+          })
+        }
+
         break;
       case "circle":
+        let newcircle = util.update_circle_image(this.data.circle_image)
+        console.log("newcircle img", newcircle)
+
         if (this.data.rect_display == "block") {
           this.setData({
-            rect_display: "none"
+            rect_display: "none",
+            rect_image: "rect",
+            circle_image: newcircle,
           })
+        } else {
+          this.setData({
+            rect_image: "rect",
+            circle_image: newcircle,
+          })
+          if (newcircle == "circles_s") {
+            this.data.arc_radius = this.data.editViewW / 35
+          } else if (newcircle == "circlem_s") {
+            this.data.arc_radius = this.data.editViewW / 25
+          } else if (newcircle == "circlel_s") {
+            this.data.arc_radius = this.data.editViewW / 20
+          }
         }
 
         break;
@@ -135,81 +211,113 @@ Page({
         this.recover()
         break;
       case "ok":
-
+        if (this.data.tuya_canvas_display == "block" || this.data.tuya_canvas_display == "block" || this.data.tuya_canvas2_display == "block") {
+          this.setData({
+            rect_display: "none",
+            tuya_canvas_display: "none",
+            tuya_canvas2_display: "none",
+            rect_display: "none"
+          })
+          wx.showLoading({
+            title: '编辑完成',
+          })
+          this.drawAction.setCtx(this.ctx)
+          this.drawAction.draw(this.okCB, true)
+        }
         break;
     }
   },
 
-  recover: function() {
+  okCB: function() {
+    wx.hideLoading()
+    var promis = new Promise(function(resolve, reject){
+      wx.canvasToTempFilePath({
+        canvasId: "image_canvas",
+        quality: 1.0,
+        success: function (res) {
+          app.globalData.editted_image = res.tempFilePath
+          console.log("编辑后题目: " + res.tempFilePath)
+          resolve(res.tempFilePath)
+        },
+        fail:function(res){}
+      })
+    })
     
-    if(this.drawAction.pop())
-    {
+    promis.then(function(res){
+      wx.navigateTo({
+        url: '../done/done',
+      })
+    })
+  },
+
+  recover: function() {
+    if (this.drawAction.pop()) {
+      this.setData({
+        tuya_canvas2_display: "block",
+        tuya_canvas_display: "block",
+      })
       wx.showLoading({
         title: '清除涂鸦痕迹',
       })
-    }
-    else
-    {
+    } else {
       wx.showToast({
         title: '已清除完毕',
       })
+      return
     }
-    let hide = 0
-    if (this.data.cutcanvas2_display == "none")
-    {
-      hide = 1
-      this.drawAction.setCtx(this.cutCtx2)
-      this.drawAction.draw()
-      this.setData({
-        cutcanvas2_display: "block"
-      })
-    }
-    else
-    {
-      hide = 2
-      this.drawAction.setCtx(this.cutCtx)
-      this.drawAction.draw()
-      this.setData({
-        cutcanvas_display: "block"
-      })
-    }
-    
 
-    let this_ = this
-    setTimeout(function () {
-      console.log("----Countdown----");
-      if(hide == 1)
-      {
-        this_.setData({
-          cutcanvas_display: "none"
-        })
-        this_.cutCtx.clearRect(0,0, this_.data.canvasW2, this_.data.canvasH2)
-        this_.cutCtx.draw()
-      }
-      else{
-        this_.setData({
-          cutcanvas2_display: "none"
-        })
-        this_.cutCtx2.clearRect(0, 0, this_.data.canvasW2, this_.data.canvasH2)
-        this_.cutCtx2.draw()
-      }
-      
-      wx.hideLoading()
-    },500);
-    
+    if (this.data.tuya_canvas2_display == "none") {
+      this.tohide = "tuya_canvas"
+      this.drawAction.setCtx(this.tuyaCtx2)
+      this.drawAction.draw(this.drawCB)
+
+    } else {
+      this.tohide = "tuya_canvas2"
+      this.drawAction.setCtx(this.tuyaCtx)
+      this.drawAction.draw(this.drawCB)
+
+    }
   },
 
-  cutStart: function(e) {
+  drawCB: function() {
+    let that = this
+    setTimeout(function() {
+      console.log("----drawcallback----");
+      if (that.tohide == "tuya_canvas") {
+        that.setData({
+          tuya_canvas_display: "none"
+        })
+
+      } else {
+        that.setData({
+          tuya_canvas2_display: "none"
+        })
+
+      }
+      wx.hideLoading()
+    }, 300)
+
+  },
+
+
+  ////////////////////////////////////////////////////////////////
+  //
+  //以下为涂鸦：点 线 矩形
+  //
+  ////////////////////////////////////////////////////////////////
+  
+
+  tuyaStart: function(e) {
     console.log("cut  start...")
 
     this.startX = e.changedTouches[0].x
     this.startY = e.changedTouches[0].y
-    let ctx = this.cutCtx
-    if (this.data.cutcanvas2_display == "block") {
-      ctx = this.cutCtx2
+    let ctx = this.tuyaCtx
+    if (this.data.tuya_canvas2_display == "block") {
+      ctx = this.tuyaCtx2
     }
     ctx.setStrokeStyle('white')
-    ctx.setFillStyle('#F0F0F0')
+    ctx.setFillStyle('white')
     ctx.setLineCap('round')
     ctx.setLineJoin('round')
     ctx.setLineWidth(this.data.arc_radius * 2)
@@ -229,8 +337,8 @@ Page({
 
   },
 
-  cutMove: function(e) {
-    
+  tuyaMove: function(e) {
+
     var startX1 = e.changedTouches[0].x
     var startY1 = e.changedTouches[0].y
     let calX = startX1 - this.startX
@@ -240,9 +348,9 @@ Page({
       return;
     }
 
-    let ctx = this.cutCtx
-    if (this.data.cutcanvas2_display == "block") {
-      ctx = this.cutCtx2
+    let ctx = this.tuyaCtx
+    if (this.data.tuya_canvas2_display == "block") {
+      ctx = this.tuyaCtx2
     }
 
     this.drawAction.addActionData({
@@ -264,7 +372,7 @@ Page({
     this.startY = startY1;
   },
 
-  cutEnd: function(e) {
+  tuyaEnd: function(e) {
     console.log("touch end...")
   },
 
@@ -300,14 +408,13 @@ Page({
     this.rectCtx.clearRect(this.rectX - 4, this.rectY - 4, this.rectX1 - this.rectX + 8, this.rectY1 - this.rectY + 8)
     this.rectCtx.draw()
 
-    let ctx = this.cutCtx
-    if(this.data.cutcanvas2_display == "block")
-    {
-      ctx = this.cutCtx2
+    let ctx = this.tuyaCtx
+    if (this.data.tuya_canvas2_display == "block") {
+      ctx = this.tuyaCtx2
     }
-    
-    
-    ctx.setFillStyle('#F0F0F0')
+
+
+    ctx.setFillStyle('white')
     let w = this.rectX1 - this.rectX
     let h = this.rectY1 - this.rectY
     ctx.fillRect(this.rectX, this.rectY, w, h)

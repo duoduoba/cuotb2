@@ -1,3 +1,4 @@
+const app = getApp()
 // pages/done.js
 Page({
 
@@ -5,14 +6,20 @@ Page({
    * 页面的初始数据
    */
   data: {
-
+    editted_image: "",
+    cutted_image: ""
   },
 
   /**
    * 生命周期函数--监听页面加载
    */
   onLoad: function (options) {
-
+    console.log("done.....onload")
+    console.log(app.globalData.cutted_image)
+    this.setData({
+      cutted_image: app.globalData.cutted_image,
+      editted_image: app.globalData.editted_image
+    })
   },
 
   /**

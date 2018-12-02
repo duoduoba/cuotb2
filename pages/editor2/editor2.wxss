@@ -11,12 +11,12 @@
 .cutset {
 	position:fixed;
   z-index:2;/*确保在遮盖的元素的上方*/
-
 }
 
 .cutset2 {
 	position:fixed;
 	z-index:1;/*确保在遮盖的元素的上方*/
+
 }
 .rect-set {
   position:fixed;
@@ -31,21 +31,21 @@
   flex-direction: column;
   justify-content: space-between;
   position: fixed;
-  bottom: 5rpx;
-  left: 5rpx;
-  width: 60rpx;
-  height: 260rpx;
+  bottom: 10rpx;
+  left: 10rpx;
+  width: 110rpx;
+  height: 340rpx;
   box-sizing: border-box;
+  
 }
 
 
 .btnControl {
-  width: 60rpx;
-  height: 60rpx;
-  border-radius: 30rpx;
-  background-color:cadetblue;
-  display: flex;
-  justify-content: center;
+  width: 70rpx;
+  height: 70rpx;
+  border-radius: 35rpx;
+  background-color:white;
+  transform: rotate(90deg);
 }
 
 .cut-set {

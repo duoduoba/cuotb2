@@ -1,2 +1,10 @@
 <!--pages/done.wxml-->
-<text>pages/done.wxml</text>
+<view class='container'>
+<view class='tag'>
+KKKKKKKKKKKKKKKK
+</view>
+<view class='cuoti'>
+<image src='{{cutted_image}}'></image>
+<image src='{{editted_image}}'></image>
+</view>
+</view>

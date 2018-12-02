@@ -130,7 +130,7 @@ DrawAction.prototype.pop = function () {
 DrawAction.prototype.setCtx = function(ctx) {
   this.ctx = ctx
   this.ctx.setStrokeStyle('white')
-  this.ctx.setFillStyle('#F0F0F0')
+  this.ctx.setFillStyle('white')
   this.ctx.setLineCap('round')
   this.ctx.setLineJoin('round')
   this.ctx.save()
@@ -153,8 +153,8 @@ DrawAction.prototype.drawaArc = function (circle) {
 }
 
 DrawAction.prototype.drawaLine = function(line) {
-  console.log("drawaLine...")
-  console.log("line w:"+line.lineWidth)
+  //console.log("drawaLine...")
+  //console.log("line w:"+line.lineWidth)
   this.ctx.setLineWidth(line.lineWidth)
   this.ctx.beginPath()
   this.ctx.moveTo(line.x, line.y)
@@ -170,9 +170,10 @@ DrawAction.prototype.drawRectangle = function(rect) {
 }
 
 
-DrawAction.prototype.draw = function() {
+DrawAction.prototype.draw = function (drawCB, reserve = false) {
   console.log("draw ....")
   console.log(this.actions)
+
   
   for (let i = 0; i < this.actions.length; i++) {
     let act = this.actions[i]
@@ -185,7 +186,8 @@ DrawAction.prototype.draw = function() {
       this.drawRectangle(act)
     }
   }
-  this.ctx.draw()
+
+  this.ctx.draw(reserve, drawCB)
 }
 
 module.exports.DrawAction = DrawAction
