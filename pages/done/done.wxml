@@ -3,11 +3,11 @@
   <view class='tag'>
     <view class="tag-title">选择科目</view>
   </view>
-  <view class='tag'>
-    <view class="tag-item">语文</view>
+  <view class='tag' >
+    
     <view class="tag-item">数学</view>
     <view class="tag-item">外语</view>
-    <view class="tag-item">物理</view>
+    <view class="tag-item" style='display:none'>物理</view>
     <view class="tag-item">科学</view>
     <view class="tag-item">+</view>
   </view>
@@ -40,10 +40,11 @@
   <view class='timu'>
     <view class="timu-title ">题干</view>
 
-
-    <image src='{{editted_image}}' style='transform: rotate(-0deg); ' mode="aspectFit"></image>
+    <canvas canvas-id="tigan_canvas"style='width: {{canvasW}}px; height: {{canvasH}}px;'></canvas>
+    
     <view class="timu-title ">原图</view>
-    <image class="timu_pic" src='{{cutted_image}}'></image>
+    <canvas canvas-id="yuantu_canvas"style='width: {{canvasW}}px; height: {{canvasH}}px;'></canvas>
   </view>
   <button type="primary" plain="false" bindtap="primary"> 保存 </button>
 </view>
+

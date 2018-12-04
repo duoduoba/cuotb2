@@ -226,7 +226,6 @@ Page({
           _this.data.cutted_image = res.tempFilePath
           console.log("编辑原题目: " + _this.data.cutted_image)
           resolve(res.tempFilePath)
-          ctx.restore()
         },
         fail: function(res) {
           console.log("保存原题失败:", res)
@@ -260,6 +259,8 @@ Page({
     })
 
     promis.then(function(res) {
+      app.globalData.createdImageW = _this.data.canvasW
+      app.globalData.createdImageH = _this.data.canvasH
       let img1 = _this.data.cutted_image
       let img2 = _this.data.editted_image
       wx.navigateTo({

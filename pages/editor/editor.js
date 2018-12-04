@@ -17,6 +17,9 @@ Page({
     imageW: 0,
     imageH: 0,
     imagePath: "",
+
+    windowHeight: 0,
+    windowWidth:0,
   },
 
   onReady: function() {
@@ -36,6 +39,10 @@ Page({
         console.log("window size: " + res.windowWidth + " " + res.windowHeight)
         console.log("screen size: " + res.screenWidth + " " + res.screenHeight)
         this.setData({
+          
+          windowHeight: res.windowHeight,
+          windowWidth: res.windowWidth,
+
           //默认设置横向图片的view
           editViewW: res.windowHeight,
           editViewH: res.windowWidth,
@@ -168,32 +175,38 @@ Page({
   cutMove: function(e)
   {
     if (this.dir < 0) return
+    
     var startX1 = e.changedTouches[0].x
     var startY1 = e.changedTouches[0].y
 
     let calX = startX1 - this.startX
     let calY = startY1 - this.startY
-    console.log("calcX:" + calX + " calcY:" + calY)
-    console.log(this.dir)
+    
     let i = this.dir //不是方向本身，是指哪个方向的矩形
     if (i == 0) {
       //console.log("top rect move")
-      this.data.cutViewTop += calY
+      if (this.data.cutViewH - calY < this.data.cutViewW) {
+        return
+      }
+      this.data.cutViewTop += calY     
       this.data.cutViewH -= calY
       
     } else if (i == 1) {
-      //console.log("btm rect move")
+      if (this.data.cutViewH + calY < this.data.cutViewW) return;
       this.data.cutViewH += calY
       //down
     } else if (i == 2) {
+      if (this.data.cutViewW - calX > this.data.cutViewH) return;
       this.data.cutViewLeft += calX
       this.data.cutViewW -= calX
       //left
     } else {
       //right
+      if (this.data.cutViewW + calX > this.data.cutViewH) return;
       this.data.cutViewW += calX
     }
 
+    
     this.drawCut()
     this.startX = startX1
     this.startY = startY1
@@ -263,71 +276,6 @@ Page({
   },
 
 
-  dragDown: function(e) {
-    console.log("touchmove......................")
-    console.log(e)
-    console.log(e.target.id)
-    console.log(e.changedTouches[0].clientX)
-    console.log(e.changedTouches[0].clientY)
-  },
-
-  cutViewDragStart: function(e) {
-    this.time = 0;
-    console.log("cutdown cutViewDragStart.....................")
-  },
-
-  cutViewDragEnd: function(e) {
-    console.log("cutdown view cutViewDragEnd......................")
-    if (e.timeStamp - this.time < 1000) {
-      console.log("cutViewDragEnd return")
-      //return
-    }
-    this.time = e.timeStamp
-
-    console.log(e.target.id)
-    console.log(e.changedTouches[0].clientX)
-    console.log(e.changedTouches[0].clientY)
-
-    let clientX = e.changedTouches[0].clientX
-    let clientY = e.changedTouches[0].clientY
-    console.log("x=" + clientX + " y=" + clientY)
-
-    let id = e.target.id
-    switch (id) {
-      case "upBtn":
-        let dis = clientY - this.data.cutViewTop
-        console.log("upbtn  move:" + dis)
-        this.setData({
-          cutViewTop: this.data.cutViewTop + dis,
-          cutViewH: this.data.cutViewH - dis
-        })
-        break;
-      case "downBtn":
-        dis = clientY - (this.data.cutViewTop + this.data.cutViewH)
-        console.log("downbtn move:" + dis)
-        this.setData({
-          cutViewH: this.data.cutViewH + dis
-        })
-        break;
-      case "centerLeftBtn":
-        dis = clientX - this.data.cutViewLeft
-        console.log("leftbtn move:" + dis)
-        this.setData({
-          cutViewLeft: this.data.cutViewLeft + dis,
-          cutViewW: this.data.cutViewW - dis,
-          //cutViewLeft: this.data.cutViewLeft + dis
-        })
-        break;
-
-      case "centerRightBtn":
-        dis = clientX - this.data.cutViewLeft - this.data.cutViewW
-        console.log("right btn move:" + dis)
-        this.setData({
-          cutViewW: this.data.cutViewW + dis
-        })
-        break;
-    }
-  },
 
   confirm: function(e) {
     //clear canvas1 , crop image into canvas2

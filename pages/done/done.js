@@ -8,7 +8,13 @@ Page({
   data: {
     editted_image: "",
     cutted_image: "",
-    rotate_value:90
+    rotate_value:90,
+    kemu: [{
+      name: '语文',
+    }, {
+        name: '数学'
+    }],
+    
   },
 
   /**
@@ -16,12 +22,75 @@ Page({
    */
   onLoad: function (options) {
     wx.hideLoading()
-    console.log("done.....onload")
     console.log(options)
+    let ratio = app.globalData.editdata.cutViewH / app.globalData.editdata.cutViewW
+    let cH = app.globalData.editdata.windowWidth / ratio
+
+    this.data.canvasH = cH
+    this.data.canvasW = app.globalData.editdata.windowWidth
+
+    console.log("done.....onload", this.data.canvasW, this.data.canvasH)
+    console.log("done.....onload", app.globalData.createdImageW, app.globalData.createdImageH)
+
+    //wx.saveImageToPhotosAlbum({
+    //  filePath: options.edit,
+    //  success(res) {
+    //    console.log("文件:" + res.savedFilePath)
+    //  }
+    //})
+    
     this.setData({
+      canvasH: cH,
+      canvasW: app.globalData.editdata.windowWidth,
       cutted_image: options.cut,
       editted_image: options.edit
     })
+    
+    this.tuyaImgPath = options.edit
+    this.cutImgPath = options.cut
+
+    let _this = this
+    var promise = new Promise(function (resolve, fail) {
+      wx.getImageInfo({
+        src: options.edit,
+
+        success(res) {
+          console.log(res.width)
+          console.log(res.height)
+          resolve(res.width, res.height)
+        },
+        fail(res) {
+          console.log("error", res)
+        }
+      })
+    })
+
+    promise.then(function (w, h) {
+      _this.drawImage(w,h)
+    })
+
+    
+  },
+
+  drawImage(w, h){
+    let tiganCtx = wx.createCanvasContext("tigan_canvas")
+    tiganCtx.save()
+    tiganCtx.translate(this.data.canvasW / 2, this.data.canvasH / 2)
+    tiganCtx.rotate(-90 * Math.PI / 180)
+    tiganCtx.arc(0, 0, this.data.canvasW / 2, 0, 2 * Math.PI);
+    tiganCtx.fill()
+    tiganCtx.drawImage(this.tuyaImgPath, 0, 0, w,h, -this.data.canvasH / 2, -this.data.canvasW / 2, this.data.canvasH, this.data.canvasW)
+    tiganCtx.draw()
+    tiganCtx.restore()
+    
+    let cutCtx = wx.createCanvasContext("yuantu_canvas")
+    cutCtx.save()
+    cutCtx.translate(this.data.canvasW / 2, this.data.canvasH / 2)
+    cutCtx.rotate(-90 * Math.PI / 180)
+    cutCtx.drawImage(this.cutImgPath, 0, 0, w,h, -this.data.canvasH / 2, -this.data.canvasW / 2, this.data.canvasH, this.data.canvasW)
+    cutCtx.draw()
+    cutCtx.restore()
+    
   },
 
   /**
