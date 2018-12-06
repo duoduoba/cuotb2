@@ -17,7 +17,7 @@
   justify-content: flex-start;
   box-sizing: border-box;
   align-items: center;
-  background-color: sandybrown;
+
   flex-wrap: wrap;
 }
 
@@ -29,19 +29,21 @@
 
 .tag-item {
   padding: 15rpx;
+  margin-top: 5rpx;
   margin-left: 15rpx;
   color: rgb(73, 70, 77);
   border-style: solid;
   border-width: 1rpx;
   border-color: gray;
   background-color: snow;
+  box-sizing: inline;
 }
 
 .timu {
   display: flex;
   flex-direction: column;
   align-items: center;
-  background-color: rgba(65, 105, 225, 0.555);
+  
   width: 100%;
 }
 
@@ -50,4 +52,18 @@
   padding-bottom: 10rpx;
   margin-top: 5rpx;
   align-self: flex-start;
+}
+
+.input_self {
+   padding: 0rpx;
+  width: 180rpx;
+  height: 30rpx;
+  border-style: solid;
+  border-width: 1rpx;
+  border-left: none;
+  border-right: none;
+  border-top: none;
+  border-color:rgba(65, 105, 225, 0.555);
+  box-sizing: inline;
+  height: 26rpx;
 }

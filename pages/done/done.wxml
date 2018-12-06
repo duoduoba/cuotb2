@@ -3,13 +3,20 @@
   <view class='tag'>
     <view class="tag-title">选择科目</view>
   </view>
-  <view class='tag' >
-    
-    <view class="tag-item">数学</view>
-    <view class="tag-item">外语</view>
-    <view class="tag-item" style='display:none'>物理</view>
-    <view class="tag-item">科学</view>
-    <view class="tag-item">+</view>
+  <view class='tag'>
+    <block wx:for="{{kemu_selected}}">
+      <view class="tag-item" id="{{item}}" bindtap='select'>{{item}}</view>
+    </block>
+    <view class="tag-item">
+      <picker mode="selector" bindchange="bindPickerChange" value="{{index}}" range="{{kemu_unselected}}">
+        新增{{kemu[index]}}
+      </picker>
+    </view>
+  </view>
+<view class='tag'>
+    <view class="tag-title"> -->自定义科目:</view>
+    <input class="input_self" value='科目名'></input>
+    <view class="tag-title">确认</view>
   </view>
 
   <view class='tag'>
@@ -25,10 +32,9 @@
     <view class="tag-title">错题来源</view>
   </view>
   <view class='tag'>
-    <view class="tag-item">单元测试</view>
-    <view class="tag-item">校联考</view>
-    <view class="tag-item">期末</view>
-    <view class="tag-item">学而思</view>
+    <block wx:for="{{source}}">
+      <view class="tag-item" style='display:{{item.show}}'>{{item.name}}</view>
+    </block>
     <view class="tag-item">+</view>
   </view>
   <view class='tag'>
@@ -40,11 +46,10 @@
   <view class='timu'>
     <view class="timu-title ">题干</view>
 
-    <canvas canvas-id="tigan_canvas"style='width: {{canvasW}}px; height: {{canvasH}}px;'></canvas>
-    
+    <canvas canvas-id="tigan_canvas" style='width: {{canvasW}}px; height: {{canvasH}}px;'></canvas>
+
     <view class="timu-title ">原图</view>
-    <canvas canvas-id="yuantu_canvas"style='width: {{canvasW}}px; height: {{canvasH}}px;'></canvas>
+    <canvas canvas-id="yuantu_canvas" style='width: {{canvasW}}px; height: {{canvasH}}px;'></canvas>
   </view>
   <button type="primary" plain="false" bindtap="primary"> 保存 </button>
 </view>
-
