@@ -9,20 +9,10 @@ Page({
     editted_image: "",
     cutted_image: "",
     rotate_value: 90,
-    kemu_selected: ["语文","数学",],
-    kemu_unselected:["外语"],
-    kemu_sel:[],
-    source: [{
-        name: "单元测试",
-        show: "inline",
-        times: 1
-      },
-      {
-        name: "学而思",
-        show: "inline",
-        times: 1
-      },
-    ],
+    selected: [{ name: "语文", bg: "white", type: "科目" }, { name: "数学", bg: "while", type: "科目" }, { name: "外语", bg: "white", type: "科目" }, { name: "单元测试", bg: "white", type: "来源" }, { name: "学校联考", bg: "white", type: "来源" }, { name: "陌生", bg: "white", type: "掌握" }, { name: "略懂", bg: "white", type: "掌握" }, { name: "基本懂", bg: "white", type: "掌握" }, { name: "掌握", bg: "white", type: "掌握" },],
+    //unselected: ["自建", "政治", "物理", "化学", "文综", "历史", "地理", "生物"],
+    unselected: [{ name: "自建", bg: "white", type: "科目" }, { name: "政治", bg: "white", type: "科目" }],
+    zijian_display: "none"
   },
 
   /**
@@ -126,6 +116,64 @@ Page({
         }
       }
     })
+  },
+
+  bindPickerChange: function(e) {
+    console.log(e)
+    let index = e.detail.value
+    if (index == 0) {
+      this.setData({
+        zijian_display: "flex"
+      })
+      return
+    }
+    this.data.selected.push({name:this.data.unselected[index],bg:"white"})
+    this.data.unselected.splice(index, 1)
+    console.log(e)
+    this.setData({
+      selected: this.data.selected,
+      unselected: this.data.unselected,
+    })
+  },
+
+  kemuTap: function(e) {
+    console.log(e)
+    let id = e.currentTarget.id
+    switch (id) {
+      case "自建科目":
+        if (this.input)
+        {
+          this.data.selected.push({ name: this.input, bg: "white" })
+          this.setData({
+            selected: this.data.selected,
+          })
+          this.input = null
+        }
+        break
+      default:
+        console.log("错误的科目选择")
+        console.log(id)
+        let _this = this
+        this.data.selected.forEach(function(value, index){
+          console.log(value,index)
+          if (value.name == id)
+          {
+            _this.data.selected[index].bg = "orange"
+          }else
+          {
+            _this.data.selected[index].bg = "white"
+          }
+        })
+        this.setData({
+          selected: this.data.selected,
+        })
+        break
+    }
+  },
+
+  bindKeyInput: function(e){
+    this.input = e.detail.value
+    console.log(this.input)
   },
   /**
    * 生命周期函数--监听页面初次渲染完成

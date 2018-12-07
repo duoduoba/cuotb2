@@ -4,38 +4,40 @@
     <view class="tag-title">选择科目</view>
   </view>
   <view class='tag'>
-    <block wx:for="{{kemu_selected}}">
-      <view class="tag-item" id="{{item}}" bindtap='select'>{{item}}</view>
+    <block wx:for="{{selected}}" wx:if="{{item.type=='科目'}}">
+      <view class="tag-item" id="{{item.name}}" bindtap='kemuTap' style='background-color:{{item.bg}}'>{{item.name}}</view>
     </block>
-    <view class="tag-item">
-      <picker mode="selector" bindchange="bindPickerChange" value="{{index}}" range="{{kemu_unselected}}">
-        新增{{kemu[index]}}
+    <view class="tag-item" style='border-style:dashed;'>
+      <picker mode="selector" bindchange="bindPickerChange" value="{{index}}" range="{{unselected}}" range-key="{{'name'}}">
+        +
       </picker>
     </view>
+    
   </view>
-<view class='tag'>
-    <view class="tag-title"> -->自定义科目:</view>
-    <input class="input_self" value='科目名'></input>
-    <view class="tag-title">确认</view>
+  <view class='tag' style='display:{{zijian_display}}'>
+    <view class="tag-title"> 自定义科目:</view>
+    <input class="input_self" bindinput="bindKeyInput" value='科目名'></input>
+    <view class="tag-title" id="自建科目" bindtap='kemuTap'>确认</view>
   </view>
 
   <view class='tag'>
     <view class="tag-title">掌握程度</view>
   </view>
   <view class='tag'>
-    <view class="tag-item">陌生</view>
-    <view class="tag-item">略懂</view>
-    <view class="tag-item">基本懂</view>
-    <view class="tag-item">掌握</view>
+
+    <block wx:for="{{selected}}" wx:if="{{item.type=='掌握'}}">
+      <view class="tag-item" id="{{item.name}}" bindtap='kemuTap' style='background-color:{{item.bg}}'>{{item.name}}</view>
+    </block>
+
   </view>
   <view class='tag'>
     <view class="tag-title">错题来源</view>
   </view>
   <view class='tag'>
-    <block wx:for="{{source}}">
-      <view class="tag-item" style='display:{{item.show}}'>{{item.name}}</view>
+    <block wx:for="{{selected}}" wx:if="{{item.type=='来源'}}">
+      <view class="tag-item" id="{{item.name}}" bindtap='kemuTap' style='background-color:{{item.bg}}'>{{item.name}}</view>
     </block>
-    <view class="tag-item">+</view>
+    <view class="tag-item" style='border-style:dashed;'>+</view>
   </view>
   <view class='tag'>
     <view class="tag-title">自定义标签</view>

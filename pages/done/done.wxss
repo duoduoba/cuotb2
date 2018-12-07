@@ -31,11 +31,11 @@
   padding: 15rpx;
   margin-top: 5rpx;
   margin-left: 15rpx;
-  color: rgb(73, 70, 77);
+
   border-style: solid;
   border-width: 1rpx;
   border-color: gray;
-  background-color: snow;
+ 
   box-sizing: inline;
 }
 
