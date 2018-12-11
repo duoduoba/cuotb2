@@ -8,14 +8,23 @@ Page({
     userInfo: {},
     hasUserInfo: false,
     canIUse: wx.canIUse('button.open-type.getUserInfo'),
+    data: [1,2,4,5],
+    imgUrls: [
+      '../../res/index/1.jpg',
+      '../../res/index/2.jpg',
+      '../../res/index/3.jpg',
+    ],
   },
   //事件处理函数
   bindViewTap: function() {
     //wx.navigateTo({
     //  url: '../logs/logs'
     //})
-    console.log("999999999");
-
+    console.log("999999999"); 
+    wx.navigateTo({
+      url: '../takephoto/takephoto',
+    })
+    /*
     wx.chooseImage({
       count: 1,
       sizeType: ['compressed'],
@@ -35,7 +44,7 @@ Page({
         console.log("failed to camera...")
         console.log(res)
       }
-    })
+    })*/
 
   },
 

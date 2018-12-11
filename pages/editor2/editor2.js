@@ -26,12 +26,22 @@ Page({
     console.log("----------------------")
     this.tohide = "nothing"
     this.tuyaCtx = wx.createCanvasContext("tuya_canvas")
-
     this.tuyaCtx2 = wx.createCanvasContext("tuya_canvas2")
-
     this.drawAction.clear()
   },
+  /**
+     * 生命周期函数--监听页面隐藏
+     */
+  onHide: function () {
 
+  },
+
+  /**
+   * 生命周期函数--监听页面卸载
+   */
+  onUnload: function () {
+    console.log("edit2 ... unload")
+  },
   onLoad: function(option) {
     this.drawAction = new ActionUtil.DrawAction()
     this.editdata = app.globalData.editdata
@@ -263,7 +273,7 @@ Page({
       app.globalData.createdImageH = _this.data.canvasH
       let img1 = _this.data.cutted_image
       let img2 = _this.data.editted_image
-      wx.navigateTo({
+      wx.redirectTo({
         url: '../done/done?cut=' + img1 + "&edit=" + img2,
       })
     })

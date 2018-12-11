@@ -1,0 +1,21 @@
+<!--pages/takephoto/takephoto.wxml-->
+
+<view class="faceCameraContiner">
+
+  <camera class='faceCameraMain' device-position="back" binderror="error">
+
+    <cover-view class="preview">
+      <cover-image class='photoview' src='{{photo_src}}' style='display:{{photo_display}}'> </cover-image>
+      <cover-view class="section-input">
+        <cover-image id='reset' class='btnControl' src='../../res/rect.jpg' bindtap='reset' style='transform: rotate(0deg); display:{{reset_display}}'></cover-image>
+
+        <cover-image id='ok' class='btnControl' bindtap='ok' src='../../res/circlem.png'></cover-image>
+
+      </cover-view>
+      <cover-view class="txthint">
+      <cover-view class="txt">面向字体拍照</cover-view>
+      </cover-view>
+    </cover-view>
+  </camera>
+
+</view>

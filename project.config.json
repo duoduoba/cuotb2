@@ -8,10 +8,12 @@
 		"es6": true,
 		"postcss": true,
 		"minified": true,
-		"newFeature": true
+		"newFeature": true,
+		"autoAudits": false,
+		"uglifyFileName": true
 	},
 	"compileType": "miniprogram",
-	"libVersion": "2.2.5",
+	"libVersion": "2.4.1",
 	"appid": "wx2ad9452a111262bd",
 	"projectname": "%E9%85%AC%E5%8B%A4%E9%94%99%E9%A2%98%E6%9C%AC",
 	"debugOptions": {

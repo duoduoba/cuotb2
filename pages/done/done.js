@@ -9,10 +9,64 @@ Page({
     editted_image: "",
     cutted_image: "",
     rotate_value: 90,
-    selected: [{ name: "语文", bg: "white", type: "科目" }, { name: "数学", bg: "while", type: "科目" }, { name: "外语", bg: "white", type: "科目" }, { name: "单元测试", bg: "white", type: "来源" }, { name: "学校联考", bg: "white", type: "来源" }, { name: "陌生", bg: "white", type: "掌握" }, { name: "略懂", bg: "white", type: "掌握" }, { name: "基本懂", bg: "white", type: "掌握" }, { name: "掌握", bg: "white", type: "掌握" },],
+    selected: [{
+      name: "语文",
+      bg: "white",
+      type: "科目"
+    }, {
+      name: "数学",
+      bg: "while",
+      type: "科目"
+    }, {
+      name: "外语",
+      bg: "white",
+      type: "科目"
+    }, {
+      name: "单元测试",
+      bg: "white",
+      type: "来源"
+    }, {
+      name: "学校联考",
+      bg: "white",
+      type: "来源"
+    }, {
+      name: "陌生",
+      bg: "white",
+      type: "掌握"
+    }, {
+      name: "略懂",
+      bg: "white",
+      type: "掌握"
+    }, {
+      name: "基本懂",
+      bg: "white",
+      type: "掌握"
+    }, {
+      name: "掌握",
+      bg: "white",
+      type: "掌握"
+    }, {
+      name: "周周练",
+      bg: "white",
+      type: "自定义"
+    }, {
+      name: "联考",
+      bg: "white",
+      type: "自定义"
+    }, ],
     //unselected: ["自建", "政治", "物理", "化学", "文综", "历史", "地理", "生物"],
-    unselected: [{ name: "自建", bg: "white", type: "科目" }, { name: "政治", bg: "white", type: "科目" }],
-    zijian_display: "none"
+    unselected: [{
+      name: "自建",
+      bg: "white",
+      type: "科目"
+    }, {
+      name: "政治",
+      bg: "white",
+      type: "科目"
+    }],
+    create_title_display: "none",
+    create_source_display: "none",
+    create_tag_display:"none",
   },
 
   /**
@@ -123,27 +177,60 @@ Page({
     let index = e.detail.value
     if (index == 0) {
       this.setData({
-        zijian_display: "flex"
+        create_title_display: "flex"
       })
       return
     }
-    this.data.selected.push({name:this.data.unselected[index],bg:"white"})
+
+    this.data.selected.push(this.data.unselected[index])
     this.data.unselected.splice(index, 1)
-    console.log(e)
+    //console.log(e)
     this.setData({
       selected: this.data.selected,
       unselected: this.data.unselected,
     })
   },
 
-  kemuTap: function(e) {
+  itemTap: function(e) {
     console.log(e)
     let id = e.currentTarget.id
-    switch (id) {
+    let itemtype = id.split("_")[0]
+    let name = id.split("_")[1]
+
+    console.log("id=", id)
+    switch (itemtype) {
       case "自建科目":
-        if (this.input)
-        {
-          this.data.selected.push({ name: this.input, bg: "white" })
+      case "自建来源":
+      case "自定义标签":
+        console.log("this.input:" + this.input)
+        if (this.input) {
+          let duplicated = false
+          for (var i = 0; i < this.data.selected.length; i++) {
+            if (this.data.selected[i].name == this.input) {
+              duplicated = true;
+              break;
+            }
+          }
+          for (var i = 0; i < this.data.unselected.length; i++) {
+            if (this.data.unselected[i].name == this.input) {
+              duplicated = true;
+              break;
+            }
+          }
+          if (duplicated) {
+            wx.showToast({
+              title: '重复创建',
+            })
+            return
+          }
+          if (itemtype == "自建科目") itemtype = "科目";
+          if (itemtype == "自建来源") itemtype = "来源";
+          if (itemtype == "自定义标签") itemtype = "自定义";
+          this.data.selected.push({
+            name: this.input,
+            bg: "white",
+            type: itemtype
+          })
           this.setData({
             selected: this.data.selected,
           })
@@ -153,14 +240,19 @@ Page({
       default:
         console.log("错误的科目选择")
         console.log(id)
+
         let _this = this
-        this.data.selected.forEach(function(value, index){
-          console.log(value,index)
-          if (value.name == id)
-          {
-            _this.data.selected[index].bg = "orange"
-          }else
-          {
+        this.data.selected.forEach(function(value, index) {
+          //console.log(value,index)
+          if (value.name == name && value.type == itemtype) {
+            if (_this.data.selected[index].bg == "white")
+            {
+              _this.data.selected[index].bg = "orange"
+            }
+            else{
+              _this.data.selected[index].bg = "white"
+            }
+          } else if (value.type == itemtype) {
             _this.data.selected[index].bg = "white"
           }
         })
@@ -171,9 +263,21 @@ Page({
     }
   },
 
-  bindKeyInput: function(e){
+  bindKeyInput: function(e) {
     this.input = e.detail.value
     console.log(this.input)
+  },
+
+  createNewSource: function(e){
+    this.setData({
+      create_source_display: "flex"
+    })
+  },
+
+  createNewTag: function(e){
+    this.setData({
+      create_tag_display: "flex"
+    })
   },
   /**
    * 生命周期函数--监听页面初次渲染完成

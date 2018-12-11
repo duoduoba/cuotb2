@@ -4,7 +4,8 @@
     "pages/editor/editor",
     "pages/editor2/editor2",
     "pages/my/my",
-    "pages/done/done"
+    "pages/done/done",
+    "pages/takephoto/takephoto"
   ],
   "window": {
     "backgroundTextStyle": "light",

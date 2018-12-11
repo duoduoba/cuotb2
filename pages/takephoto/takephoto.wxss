@@ -1,0 +1,59 @@
+/* pages/takephoto/takephoto.wxss */
+.faceCameraContiner {
+  display: flex;
+  width: 100%;
+  height: 100vh;  
+}
+
+.faceCameraMain {
+  flex: 1;
+}
+
+.preview {
+  display: flex;
+  width: 100%;
+  height: 100%;
+}
+
+.section-input {
+  z-index: 5;
+  padding: 0rpx;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  position: fixed;
+  bottom: 10rpx;
+  left: 10rpx;
+  width: 110rpx;
+  height: 240rpx;
+  box-sizing: border-box;
+}
+
+
+.btnControl {
+  width: 70rpx;
+  height: 70rpx;
+  border-radius: 35rpx;
+  background-color:white;
+  transform: rotate(90deg);
+}
+
+.txthint {
+  z-index: 5;
+  padding: 0rpx;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  position: fixed;
+  bottom: 10rpx;
+  right: 10rpx;
+  width: 110rpx;
+  height: 340rpx;
+  box-sizing: border-box;
+}
+
+.txt {
+  transform: rotate(90deg);
+
+}

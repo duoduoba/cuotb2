@@ -1,23 +1,23 @@
 <!--pages/done.wxml-->
-<view class='container'>
+<view class='global_attr container'>
   <view class='tag'>
     <view class="tag-title">选择科目</view>
   </view>
   <view class='tag'>
-    <block wx:for="{{selected}}" wx:if="{{item.type=='科目'}}">
-      <view class="tag-item" id="{{item.name}}" bindtap='kemuTap' style='background-color:{{item.bg}}'>{{item.name}}</view>
+    <block wx:for="{{selected}}" wx:key="*this" wx:if="{{item.type=='科目'}}">
+      <view class="tag-item" id="{{item.type}}_{{item.name}}" bindtap='itemTap' style='background-color:{{item.bg}}'>{{item.name}}</view>
     </block>
     <view class="tag-item" style='border-style:dashed;'>
       <picker mode="selector" bindchange="bindPickerChange" value="{{index}}" range="{{unselected}}" range-key="{{'name'}}">
         +
       </picker>
     </view>
-    
+
   </view>
-  <view class='tag' style='display:{{zijian_display}}'>
+  <view class='tag' style='display:{{create_title_display}}'>
     <view class="tag-title"> 自定义科目:</view>
     <input class="input_self" bindinput="bindKeyInput" value='科目名'></input>
-    <view class="tag-title" id="自建科目" bindtap='kemuTap'>确认</view>
+    <view class="tag-title" id="自建科目_自建科目" bindtap='itemTap'>确认</view>
   </view>
 
   <view class='tag'>
@@ -25,8 +25,8 @@
   </view>
   <view class='tag'>
 
-    <block wx:for="{{selected}}" wx:if="{{item.type=='掌握'}}">
-      <view class="tag-item" id="{{item.name}}" bindtap='kemuTap' style='background-color:{{item.bg}}'>{{item.name}}</view>
+    <block wx:for="{{selected}}" wx:key="*this" wx:if="{{item.type=='掌握'}}">
+      <view class="tag-item" id="{{item.type}}_{{item.name}}" type="掌握" bindtap='itemTap' style='background-color:{{item.bg}}'>{{item.name}}</view>
     </block>
 
   </view>
@@ -34,24 +34,40 @@
     <view class="tag-title">错题来源</view>
   </view>
   <view class='tag'>
-    <block wx:for="{{selected}}" wx:if="{{item.type=='来源'}}">
-      <view class="tag-item" id="{{item.name}}" bindtap='kemuTap' style='background-color:{{item.bg}}'>{{item.name}}</view>
+    <block wx:for="{{selected}}" wx:key="*this" wx:if="{{item.type=='来源'}}">
+      <view class="tag-item" id="{{item.type}}_{{item.name}}" bindtap='itemTap' style='background-color:{{item.bg}}'>{{item.name}}</view>
     </block>
-    <view class="tag-item" style='border-style:dashed;'>+</view>
+    <view class="tag-item" style='border-style:dashed;' bindtap='createNewSource'>+</view>
+    
   </view>
+  <view class='tag' style='display:{{create_source_display}}'>
+    <view class="tag-title"> 自定义来源:</view>
+    <input class="input_self" bindinput="bindKeyInput" value='错题来源'></input>
+    <view class="tag-title" id="自建来源_自建来源" bindtap='itemTap'>确认</view>
+  </view>
+
   <view class='tag'>
     <view class="tag-title">自定义标签</view>
   </view>
   <view class='tag'>
-    <view class="tag-item">+</view>
+    <block wx:for="{{selected}}" wx:key="*this" wx:if="{{item.type=='自定义'}}">
+      <view class="tag-item" id="{{item.type}}_{{item.name}}" bindtap='itemTap' style='background-color:{{item.bg}}'>{{item.name}}</view>
+    </block>
+    <view class="tag-item" style='border-style:dashed;' bindtap='createNewTag'>+</view>
   </view>
+  <view class='tag' style='display:{{create_tag_display}}'>
+    <view class="tag-title"> 请输入新标签:</view>
+    <input class="input_self" bindinput="bindKeyInput" value='新标签'></input>
+    <view class="tag-title" id="自定义标签_自定义标签" bindtap='itemTap'>确认</view>
+  </view>
+  
   <view class='timu'>
     <view class="timu-title ">题干</view>
-
     <canvas canvas-id="tigan_canvas" style='width: {{canvasW}}px; height: {{canvasH}}px;'></canvas>
-
-    <view class="timu-title ">原图</view>
+    <view class="timu-title ">原题</view>
     <canvas canvas-id="yuantu_canvas" style='width: {{canvasW}}px; height: {{canvasH}}px;'></canvas>
   </view>
-  <button type="primary" plain="false" bindtap="primary"> 保存 </button>
+  
 </view>
+
+<button class='save' type="default" size='default' plain="false" bindtap="primary"> 保存 </button>

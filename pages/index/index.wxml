@@ -1,28 +1,44 @@
 <!--index.wxml-->
-<view class="container">
+<view class="global_attr container">
   <view class='headinfo'>
-    公告区
-    
-  </view>
-  <view class="cuoti_status">
-    <view class="userinfo">
-      <button wx:if="{{!hasUserInfo && canIUse}}" open-type="getUserInfo" bindgetuserinfo="getUserInfo"> 获取头像昵称 </button>
-      <block class="tmp" wx:else>
-        <image bindtap="bindViewTap" class="userinfo-avatar" src="../../res/math.jpg" mode="cover"></image>
-        <text class="userinfo-nickname">{{userInfo.nickName}}</text>
+    <swiper indicator-dots="true" autoplay="true">
+      <block wx:for="{{imgUrls}}">
+        <swiper-item>
+          <image src="../../res/index/1.jpg" class="slide-image" />
+        </swiper-item>
       </block>
-    </view>
-    <view class="userinfo">
-      <button wx:if="{{!hasUserInfo && canIUse}}" open-type="getUserInfo" bindgetuserinfo="getUserInfo"> 获取头像昵称 </button>
-      <block class="tmp" wx:else>
-        <image bindtap="bindViewTap2" class="userinfo-avatar" src="../../res/math.jpg" mode="cover"></image>
-        <text class="userinfo-nickname">{{userInfo.nickName}}</text>
-      </block>
-    </view>
+    </swiper>
 
   </view>
 
-  <view class="usermotto">
-    <text class="user-motto">{{motto}}</text>
+  <view class='datainfo'>
+    <scroll-view scroll-y style="height: 100%;" bindscrolltoupper="upper" bindscrolltolower="lower">
+
+      <block wx:for="{{data}}" wx:key="*this">
+        <view class="row">
+          <view class='item' >
+            <image class='item_imae' src='../../res/index/yuwen.jpg'></image>
+            <text class='item_txt'>语文/15</text>
+          </view>
+          <view class='item' style='margin: 0 5rpx;'>
+          <image class='item_imae' src='../../res/index/yuwen.jpg'></image>
+            <text class='item_txt'>语文/15</text>
+            </view>
+          <view class='item' >
+          <image class='item_imae' src='../../res/index/yuwen.jpg'></image>
+            <text class='item_txt'>语文/15</text>
+            </view>
+        </view>
+      </block>
+
+
+    </scroll-view>
   </view>
+
+
+
+</view>
+
+<view class='camera'>
+  <image class='camera_item' src='../../res/index/camera.jpg'></image>
 </view>
