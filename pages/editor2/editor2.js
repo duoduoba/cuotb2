@@ -420,14 +420,51 @@ Page({
     this.rectEraser = true
     this.rectX1 = e.changedTouches[0].x
     this.rectY1 = e.changedTouches[0].y
-    //if(Math.abs(this.rectX1 - this.rectX) < 10 || Math.abs(this.rectY1 - this.rectY))
+    if(Math.abs(this.rectX1 - this.rectX) < 15 || Math.abs(this.rectY1 - this.rectY) < 15)
     {
-      //return
+      console.log("rectmove ... return")
+      return
     }
     //console.log("move to: x=" + this.rectX1 + " y=" + this.rectY1)
     var ctx = this.rectCtx
     ctx.setStrokeStyle('white')
-    ctx.strokeRect(this.rectX, this.rectY, this.rectX1 - this.rectX, this.rectY1 - this.rectY)
+    ctx.setLineDash([10, 5]);
+    
+    this.x = this.y = this.w = this.h = 0
+
+    if (this.rectX1 < this.rectX && this.rectY1 < this.rectY){
+      this.x = this.rectX1
+      this.y = this.rectY1
+      this.w = this.rectX - this.rectX1
+      this.h = this.rectY - this.rectY1
+      console.log("左上")
+    }
+    else if (this.rectX1 < this.rectX && this.rectY1 > this.rectY){
+      this.x = this.rectX1
+      this.y = this.rectY
+      this.w = this.rectX - this.rectX1
+      this.h = this.rectY1 - this.rectY
+      console.log("左下")
+    }
+    else if (this.rectX1 > this.rectX && this.rectY1 < this.rectY)
+    {
+      this.x = this.rectX
+      this.y = this.rectY1
+      this.w = this.rectX1 - this.rectX
+      this.h = this.rectY - this.rectY1
+
+      console.log("右上")
+    }
+    else
+    {
+      this.x = this.rectX
+      this.y = this.rectY
+      this.w = this.rectX1 - this.rectX
+      this.h = this.rectY1 - this.rectY
+      console.log("右下")
+    }
+    
+    ctx.strokeRect(this.x, this.y, this.w, this.h)
     ctx.draw()
   },
 
@@ -436,6 +473,7 @@ Page({
 
     this.rectCtx.clearRect(this.rectX - 4, this.rectY - 4, this.rectX1 - this.rectX + 8, this.rectY1 - this.rectY + 8)
     this.rectCtx.draw()
+    this.rectCtx  = null
 
     let ctx = this.tuyaCtx
     if (this.data.tuya_canvas2_display == "block") {
@@ -446,7 +484,8 @@ Page({
     ctx.setFillStyle('white')
     let w = this.rectX1 - this.rectX
     let h = this.rectY1 - this.rectY
-    ctx.fillRect(this.rectX, this.rectY, w, h)
+    //ctx.fillRect(this.rectX, this.rectY, w, h)
+    ctx.fillRect(this.x, this.y, this.w, this.h)
     ctx.draw(true)
 
     this.drawAction.addActionData({
